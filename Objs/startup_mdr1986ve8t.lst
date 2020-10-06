@@ -1,0 +1,1902 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000         ;/******************************************************
+                       ***********************/
+    2 00000000         ;/* 1986VE1T.s: Startup file for ARM Cortex-M1 Device Fa
+                       mily                   */
+    3 00000000         ;/******************************************************
+                       ***********************/
+    4 00000000         ;/* <<< Use Configuration Wizard in Context Menu >>>    
+                                             */
+    5 00000000         ;/******************************************************
+                       ***********************/
+    6 00000000         ;/* This file is part of the uVision/ARM development too
+                       ls.                   */
+    7 00000000         ;/* Copyright (c) 2005-2008 Keil Software. All rights re
+                       served.               */
+    8 00000000         ;/* This software may only be used under the terms of a 
+                       valid, current,       */
+    9 00000000         ;/* end user licence from KEIL for a compatible version 
+                       of KEIL software      */
+   10 00000000         ;/* development tools. Nothing else gives you the right 
+                       to use this software. */
+   11 00000000         ;/******************************************************
+                       ***********************/
+   12 00000000         
+   13 00000000         
+   14 00000000         ;// <h> Stack Configuration
+   15 00000000         ;//   <o> Stack Size (in Bytes) <0x0-0xFFFFFFFF:8>
+   16 00000000         ;// </h>
+   17 00000000         
+   18 00000000 00000400 
+                       Stack_Size
+                               EQU              0x00000400
+   19 00000000         
+   20 00000000                 AREA             STACK, NOINIT, READWRITE, ALIGN
+=3
+   21 00000000         Stack_Mem
+                               SPACE            Stack_Size
+   22 00000400         __initial_sp
+   23 00000400         
+   24 00000400         
+   25 00000400         ;// <h> Heap Configuration
+   26 00000400         ;//   <o>  Heap Size (in Bytes) <0x0-0xFFFFFFFF:8>
+   27 00000400         ;// </h>
+   28 00000400         
+   29 00000400 00000400 
+                       Heap_Size
+                               EQU              0x00000400
+   30 00000400         
+   31 00000400         
+   32 00000400                 AREA             HEAP, NOINIT, READWRITE, ALIGN=
+3
+   33 00000000         __heap_base
+   34 00000000         Heap_Mem
+                               SPACE            Heap_Size
+   35 00000400         __heap_limit
+   36 00000400         
+   37 00000400                 PRESERVE8
+   38 00000400                 THUMB
+   39 00000400         
+   40 00000400         ; Vector Table Mapped to Address 0 at Reset
+
+
+
+ARM Macro Assembler    Page 2 
+
+
+   41 00000400         
+   42 00000400                 AREA             RESET, DATA, READONLY
+   43 00000000                 EXPORT           __Vectors
+   44 00000000                 EXPORT           __Vectors_End
+   45 00000000                 EXPORT           __Vectors_Size
+   46 00000000         
+   47 00000000 00000000 
+                       __Vectors
+                               DCD              __initial_sp ; Top of Stack
+   48 00000004 00000000        DCD              Reset_Handler ; Reset Handler
+   49 00000008 00000000        DCD              NMI_Handler ; NMI Handler
+   50 0000000C 00000000        DCD              HardFault_Handler ; Hard Fault 
+                                                            Handler
+   51 00000010 00000000        DCD              MemoryMngFault_Handler ; Memory
+                                                            MngFault_Handler
+   52 00000014 00000000        DCD              BusFault_Handler 
+                                                            ; BusFault_Handler
+   53 00000018 00000000        DCD              UsageFault_Handler ; UsageFault
+                                                            _Handler
+   54 0000001C 00000000        DCD              0           ; Reserved
+   55 00000020 00000000        DCD              0           ; Reserved
+   56 00000024 00000000        DCD              0           ; Reserved
+   57 00000028 00000000        DCD              0           ; Reserved
+   58 0000002C 00000000        DCD              SVCall_Handler ; SVCall Handler
+                                                            
+   59 00000030 00000000        DCD              0           ; Reserved
+   60 00000034 00000000        DCD              0           ; Reserved
+   61 00000038 00000000        DCD              PendSV_Handler ; PendSV Handler
+                                                            
+   62 0000003C 00000000        DCD              Systick_Handler 
+                                                            ; SysTick Handler
+   63 00000040 00000000        DCD              0           ; Reserved16
+   64 00000044 00000000        DCD              0           ; Reserved17
+   65 00000048 00000000        DCD              0           ; Reserved18
+   66 0000004C 00000000        DCD              0           ; Reserved19
+   67 00000050 00000000        DCD              0           ; Reserved20
+   68 00000054 00000000        DCD              0           ; Reserved21
+   69 00000058 00000000        DCD              0           ; Reserved22
+   70 0000005C 00000000        DCD              0           ; Reserved23
+   71 00000060 00000000        DCD              0           ; Reserved24
+   72 00000064 00000000        DCD              0           ; Reserved25
+   73 00000068 00000000        DCD              0           ; Reserved26
+   74 0000006C 00000000        DCD              0           ; Reserved27
+   75 00000070 00000000        DCD              0           ; Reserved28
+   76 00000074 00000000        DCD              0           ; Reserved29
+   77 00000078 00000000        DCD              0           ; Reserved30
+   78 0000007C 00000000        DCD              0           ; Reserved31
+   79 00000080 00000000        DCD              0           ; Reserved32
+   80 00000084 00000000        DCD              0           ; Reserved33
+   81 00000088 00000000        DCD              0           ; Reserved34
+   82 0000008C 00000000        DCD              0           ; Reserved35
+   83 00000090 00000000        DCD              0           ; Reserved36
+   84 00000094 00000000        DCD              0           ; Reserved37
+   85 00000098 00000000        DCD              0
+   86 0000009C 00000000        DCD              0
+   87 000000A0 00000000        DCD              0
+   88 000000A4 00000000        DCD              0
+   89 000000A8 00000000        DCD              0
+   90 000000AC 00000000        DCD              0
+
+
+
+ARM Macro Assembler    Page 3 
+
+
+   91 000000B0 00000000        DCD              0
+   92 000000B4 00000000        DCD              0
+   93 000000B8 00000000        DCD              0
+   94 000000BC 00000000        DCD              0
+   95 000000C0 00000000        DCD              FT_IF0_Handler ; FT_IF0_Handler
+                                                            
+   96 000000C4 00000000        DCD              FT_IF1_Handler ; FT_IF1_Handler
+                                                            
+   97 000000C8 00000000        DCD              FT_IF2_Handler ; FT_IF2_Handler
+                                                            
+   98 000000CC 00000000        DCD              FT_IF3_Handler ; FT_IF3_Handler
+                                                            
+   99 000000D0 00000000        DCD              CLK_IF_Handler ; CLK_IF_Handler
+                                                            
+  100 000000D4 00000000        DCD              PVD_IF_Handler ; PVD_IF_Handler
+                                                            
+  101 000000D8 00000000        DCD              RTC_IF_Handler ; RTC_IF_Handler
+                                                            
+  102 000000DC 00000000        DCD              BKP_IF_Handler ; BKP_IF_Handler
+                                                            
+  103 000000E0 00000000        DCD              EXT_INTERROR0_Handler ; EXT_INT
+                                                            ERROR0_Handler
+  104 000000E4 00000000        DCD              EXT_INTERROR1_Handler ; EXT_INT
+                                                            ERROR1_Handler
+  105 000000E8 00000000        DCD              EXT_INTERROR2_Handler ; EXT_INT
+                                                            ERROR2_Handler
+  106 000000EC 00000000        DCD              EXT_INTERROR3_Handler ; EXT_INT
+                                                            ERROR3_Handler
+  107 000000F0 00000000        DCD              EXT_INTERROR4_Handler ; EXT_INT
+                                                            ERROR4_Handler
+  108 000000F4 00000000        DCD              EXT_INTERROR5_Handler ; EXT_INT
+                                                            ERROR5_Handler
+  109 000000F8 00000000        DCD              EXT_INTERROR6_Handler ; EXT_INT
+                                                            ERROR6_Handler
+  110 000000FC 00000000        DCD              EXT_INTERROR7_Handler ; EXT_INT
+                                                            ERROR7_Handler
+  111 00000100 00000000        DCD              IF_ERR_SCR_Handler ; IF_ERR_SCR
+                                                            _Handler           
+                                                                               
+                                                                
+  112 00000104 00000000        DCD              IF_FIN_SCR_Handler ; IF_FIN_SCR
+                                                            _Handler           
+                                                                               
+                                                                
+  113 00000108 00000000        DCD              DMA_ERR_Handler ; DMA_ERR_Handl
+                                                            er     
+  114 0000010C 00000000        DCD              DMA_DONE0_Handler ; DMA_DONE0_H
+                                                            andler   
+  115 00000110 00000000        DCD              DMA_DONE1_Handler 
+                                                            ; DMA_DONE1_Handler
+                                                            
+  116 00000114 00000000        DCD              0           ; DMA_DONE2_Handler
+                                                               
+  117 00000118 00000000        DCD              0           ; DMA_DONE3_Handler
+                                                               
+  118 0000011C 00000000        DCD              0           ; DMA_DONE4_Handler
+                                                               
+  119 00000120 00000000        DCD              0           ; DMA_DONE5_Handler
+                                                               
+
+
+
+ARM Macro Assembler    Page 4 
+
+
+  120 00000124 00000000        DCD              0           ; DMA_DONE6_Handler
+                                                               
+  121 00000128 00000000        DCD              0           ; DMA_DONE7_Handler
+                                                               
+  122 0000012C 00000000        DCD              0           ; DMA_DONE8_Handler
+                                                               
+  123 00000130 00000000        DCD              0           ; DMA_DONE9_Handler
+                                                               
+  124 00000134 00000000        DCD              0           ; DMA_DONE10_Handle
+                                                            r  
+  125 00000138 00000000        DCD              0           ; DMA_DONE11_Handle
+                                                            r
+  126 0000013C 00000000        DCD              0           ; DMA_DONE12_Handle
+                                                            r  
+  127 00000140 00000000        DCD              0           ; DMA_DONE13_Handle
+                                                            r
+  128 00000144 00000000        DCD              0           ; DMA_DONE14_Handle
+                                                            r  
+  129 00000148 00000000        DCD              0           ; DMA_DONE15_Handle
+                                                            r  
+  130 0000014C 00000000        DCD              0           ; DMA_DONE16_Handle
+                                                            r  
+  131 00000150 00000000        DCD              0           ; DMA_DONE17_Handle
+                                                            r  
+  132 00000154 00000000        DCD              0           ; DMA_DONE18_Handle
+                                                            r  
+  133 00000158 00000000        DCD              0           ; DMA_DONE19_Handle
+                                                            r  
+  134 0000015C 00000000        DCD              0           ; DMA_DONE20_Handle
+                                                            r  
+  135 00000160 00000000        DCD              0           ; DMA_DONE21_Handle
+                                                            r  
+  136 00000164 00000000        DCD              0           ; DMA_DONE22_Handle
+                                                            r  
+  137 00000168 00000000        DCD              0           ; DMA_DONE23_Handle
+                                                            r
+  138 0000016C 00000000        DCD              0           ; DMA_DONE24_Handle
+                                                            r  
+  139 00000170 00000000        DCD              0           ; DMA_DONE25_Handle
+                                                            r
+  140 00000174 00000000        DCD              0           ; DMA_DONE26_Handle
+                                                            r  
+  141 00000178 00000000        DCD              0           ; DMA_DONE27_Handle
+                                                            r  
+  142 0000017C 00000000        DCD              0           ; DMA_DONE28_Handle
+                                                            r  
+  143 00000180 00000000        DCD              0           ; DMA_DONE29_Handle
+                                                            r  
+  144 00000184 00000000        DCD              0           ; DMA_DONE30_Handle
+                                                            r  
+  145 00000188 00000000        DCD              0           ; DMA_DONE31_Handle
+                                                            r                  
+                                                                    
+  146 0000018C 00000000        DCD              IRQ_PORTA_Handler ; IRQ_PORTA_H
+                                                            andler             
+                                                                               
+                                                               
+  147 00000190 00000000        DCD              IRQ_PORTB_Handler 
+                                                            ; IRQ_PORTB_Handler
+
+
+
+ARM Macro Assembler    Page 5 
+
+
+                                                            
+  148 00000194 00000000        DCD              IRQ_PORTC_Handler 
+                                                            ; IRQ_PORTC_Handler
+                                                            
+  149 00000198 00000000        DCD              IRQ_PORTD_Handler 
+                                                            ; IRQ_PORTD_Handler
+                                                            
+  150 0000019C 00000000        DCD              IRQ_PORTE_Handler 
+                                                            ; IRQ_PORTE_Handler
+                                                            
+  151 000001A0 00000000        DCD              IRQ_PORTF_Handler 
+                                                            ; IRQ_PORTF_Handler
+                                                            
+  152 000001A4 00000000        DCD              INT_ETH0_Handler 
+                                                            ; INT_ETH0_Handler
+  153 000001A8 00000000        DCD              INT_ETH1_Handler ; INT_ETH1_Han
+                                                            dler    
+  154 000001AC 00000000        DCD              INT_SPW0_Handler 
+                                                            ; INT_SPW0_Handler
+  155 000001B0 00000000        DCD              INT_SPW1_Handler 
+                                                            ; INT_SPW1_Handler
+  156 000001B4 00000000        DCD              INT_TMR0_Handler 
+                                                            ; INT_TMR0_Handler
+  157 000001B8 00000000        DCD              INT_TMR1_Handler 
+                                                            ; INT_TMR1_Handler
+  158 000001BC 00000000        DCD              INT_TMR2_Handler 
+                                                            ; INT_TMR2_Handler
+  159 000001C0 00000000        DCD              INT_TMR3_Handler 
+                                                            ; INT_TMR3_Handler
+  160 000001C4 00000000        DCD              INT_TMR4_Handler 
+                                                            ; INT_TMR4_Handler
+  161 000001C8 00000000        DCD              INT_TMR5_Handler 
+                                                            ; INT_TMR5_Handler
+  162 000001CC 00000000        DCD              INT_CAN0_Handler 
+                                                            ; INT_CAN0_Handler
+  163 000001D0 00000000        DCD              INT_CAN1_Handler 
+                                                            ; INT_CAN1_Handler
+  164 000001D4 00000000        DCD              INT_CAN2_Handler 
+                                                            ; INT_CAN2_Handler
+  165 000001D8 00000000        DCD              INT_CAN3_Handler 
+                                                            ; INT_CAN3_Handler
+  166 000001DC 00000000        DCD              INT_CAN4_Handler ; INT_CAN4_Han
+                                                            dler               
+                                                                         
+  167 000001E0 00000000        DCD              INT_SSP0_Handler ; INT_SSP0_Han
+                                                            dler    
+  168 000001E4 00000000        DCD              INT_SSP1_Handler 
+                                                            ; INT_SSP1_Handler
+  169 000001E8 00000000        DCD              INT_SSP2_Handler 
+                                                            ; INT_SSP2_Handler
+  170 000001EC 00000000        DCD              INT_SSP3_Handler ; INT_SSP3_Han
+                                                            dler               
+                                                                         
+  171 000001F0 00000000        DCD              INT_UART0_Handler 
+                                                            ; INT_UART0_Handler
+                                                            
+  172 000001F4 00000000        DCD              INT_UART1_Handler 
+                                                            ; INT_UART1_Handler
+                                                            
+
+
+
+ARM Macro Assembler    Page 6 
+
+
+  173 000001F8 00000000        DCD              INT_UART2_Handler 
+                                                            ; INT_UART2_Handler
+                                                            
+  174 000001FC 00000000        DCD              INT_UART3_Handler 
+                                                            ; INT_UART3_Handler
+                                                            
+  175 00000200 00000000        DCD              INT_USB_Handler 
+                                                            ; INT_USB_Handler
+  176 00000204 00000000        DCD              INT_RX_ARC0_Handler ; INT_RX_AR
+                                                            C0_Handler
+  177 00000208 00000000        DCD              INT_TX_ARC0_Handler ; INT_TX_AR
+                                                            C0_Handler
+  178 0000020C 00000000        DCD              INT_RX_ARC1_Handler ; INT_RX_AR
+                                                            C1_Handler
+  179 00000210 00000000        DCD              INT_TX_ARC1_Handler ; INT_TX_AR
+                                                            C1_Handler
+  180 00000214 00000000        DCD              INT_MIL0_Handler 
+                                                            ; INT_MIL0_Handler
+  181 00000218 00000000        DCD              INT_MIL1_Handler 
+                                                            ; INT_MIL1_Handler
+  182 0000021C 00000000        DCD              INT_ADC0_Handler 
+                                                            ; INT_ADC0_Handler
+  183 00000220 00000000        DCD              INT_ADC1_Handler 
+                                                            ; INT_ADC1_Handler
+  184 00000224 00000000        DCD              INT_DAC0_Handler 
+                                                            ; INT_DAC0_Handler
+  185 00000228 00000000        DCD              INT_DAC1_Handler ; INT_DAC1_Han
+                                                            dler               
+                                                                               
+                                                              
+  186 0000022C 00000000        DCD              INT_CRYPTO_Handler ; INT_CRYPTO
+                                                            _Handler  
+  187 00000230 00000000        DCD              INT_CRC_Handler ; INT_CRC_Handl
+                                                            er                 
+                                                                               
+                                                             
+  188 00000234 00000000        DCD              INT_ECC_Handler ; INT_ECC_Handl
+                                                            er                 
+                                                                               
+                                                                               
+                                                                  
+  189 00000238         __Vectors_End
+  190 00000238         
+  191 00000238 00000238 
+                       __Vectors_Size
+                               EQU              __Vectors_End - __Vectors
+  192 00000238         
+  193 00000238                 AREA             |.text|, CODE, READONLY
+  194 00000000         
+  195 00000000         
+  196 00000000         ; Reset Handler
+  197 00000000         
+  198 00000000         Reset_Handler
+                               PROC
+  199 00000000                 EXPORT           Reset_Handler                  
+ [WEAK]
+  200 00000000                 IMPORT           __main
+  201 00000000 4827            LDR              R0,=__main
+  202 00000002 4700            BX               R0
+
+
+
+ARM Macro Assembler    Page 7 
+
+
+  203 00000004                 ENDP
+  204 00000004         
+  205 00000004         
+  206 00000004         ; Dummy Exception Handlers (infinite loops which can be 
+                       modified)                
+  207 00000004         
+  208 00000004         NMI_Handler
+                               PROC
+  209 00000004                 EXPORT           NMI_Handler                    
+ [WEAK]
+  210 00000004 E7FE            B                .
+  211 00000006                 ENDP
+  212 00000006         
+  213 00000006         HardFault_Handler
+                               PROC
+  214 00000006                 EXPORT           HardFault_Handler              
+ [WEAK]
+  215 00000006 E7FE            B                .
+  216 00000008                 ENDP
+  217 00000008         
+  218 00000008         MemoryMngFault_Handler
+                               PROC
+  219 00000008                 EXPORT           MemoryMngFault_Handler         
+ [WEAK]
+  220 00000008 E7FE            B                .
+  221 0000000A                 ENDP
+  222 0000000A         
+  223 0000000A         BusFault_Handler
+                               PROC
+  224 0000000A                 EXPORT           BusFault_Handler               
+ [WEAK]
+  225 0000000A E7FE            B                .
+  226 0000000C                 ENDP
+  227 0000000C         
+  228 0000000C         UsageFault_Handler
+                               PROC
+  229 0000000C                 EXPORT           UsageFault_Handler             
+ [WEAK]
+  230 0000000C E7FE            B                .
+  231 0000000E                 ENDP
+  232 0000000E         
+  233 0000000E         SVCall_Handler
+                               PROC
+  234 0000000E                 EXPORT           SVCall_Handler                 
+ [WEAK]
+  235 0000000E E7FE            B                .
+  236 00000010                 ENDP
+  237 00000010         
+  238 00000010         PendSV_Handler
+                               PROC
+  239 00000010                 EXPORT           PendSV_Handler                 
+ [WEAK]
+  240 00000010 E7FE            B                .
+  241 00000012                 ENDP
+  242 00000012         
+  243 00000012         Systick_Handler
+                               PROC
+  244 00000012                 EXPORT           Systick_Handler                
+ [WEAK]
+
+
+
+ARM Macro Assembler    Page 8 
+
+
+  245 00000012 E7FE            B                .
+  246 00000014                 ENDP
+  247 00000014         
+  248 00000014         FT_IF0_Handler
+                               PROC
+  249 00000014                 EXPORT           FT_IF0_Handler                 
+ [WEAK]
+  250 00000014 E7FE            B                .
+  251 00000016                 ENDP
+  252 00000016         
+  253 00000016         FT_IF1_Handler
+                               PROC
+  254 00000016                 EXPORT           FT_IF1_Handler                 
+ [WEAK]
+  255 00000016 E7FE            B                .
+  256 00000018                 ENDP
+  257 00000018         
+  258 00000018         FT_IF2_Handler
+                               PROC
+  259 00000018                 EXPORT           FT_IF2_Handler                 
+ [WEAK]
+  260 00000018 E7FE            B                .
+  261 0000001A                 ENDP
+  262 0000001A         
+  263 0000001A         FT_IF3_Handler
+                               PROC
+  264 0000001A                 EXPORT           FT_IF3_Handler                 
+ [WEAK]
+  265 0000001A E7FE            B                .
+  266 0000001C                 ENDP
+  267 0000001C         
+  268 0000001C         CLK_IF_Handler
+                               PROC
+  269 0000001C                 EXPORT           CLK_IF_Handler                 
+ [WEAK]
+  270 0000001C E7FE            B                .
+  271 0000001E                 ENDP
+  272 0000001E         
+  273 0000001E         PVD_IF_Handler
+                               PROC
+  274 0000001E                 EXPORT           PVD_IF_Handler                 
+ [WEAK]
+  275 0000001E E7FE            B                .
+  276 00000020                 ENDP
+  277 00000020         
+  278 00000020         RTC_IF_Handler
+                               PROC
+  279 00000020                 EXPORT           RTC_IF_Handler                 
+ [WEAK]
+  280 00000020 E7FE            B                .
+  281 00000022                 ENDP
+  282 00000022         
+  283 00000022         BKP_IF_Handler
+                               PROC
+  284 00000022                 EXPORT           BKP_IF_Handler                 
+ [WEAK]
+  285 00000022 E7FE            B                .
+  286 00000024                 ENDP
+  287 00000024         
+
+
+
+ARM Macro Assembler    Page 9 
+
+
+  288 00000024         EXT_INTERROR0_Handler
+                               PROC
+  289 00000024                 EXPORT           EXT_INTERROR0_Handler          
+ [WEAK]
+  290 00000024 E7FE            B                .
+  291 00000026                 ENDP
+  292 00000026         
+  293 00000026         EXT_INTERROR1_Handler
+                               PROC
+  294 00000026                 EXPORT           EXT_INTERROR1_Handler          
+ [WEAK]
+  295 00000026 E7FE            B                .
+  296 00000028                 ENDP
+  297 00000028         
+  298 00000028         EXT_INTERROR2_Handler
+                               PROC
+  299 00000028                 EXPORT           EXT_INTERROR2_Handler          
+ [WEAK]
+  300 00000028 E7FE            B                .
+  301 0000002A                 ENDP
+  302 0000002A         
+  303 0000002A         EXT_INTERROR3_Handler
+                               PROC
+  304 0000002A                 EXPORT           EXT_INTERROR3_Handler          
+ [WEAK]
+  305 0000002A E7FE            B                .
+  306 0000002C                 ENDP
+  307 0000002C         
+  308 0000002C         EXT_INTERROR4_Handler
+                               PROC
+  309 0000002C                 EXPORT           EXT_INTERROR4_Handler          
+ [WEAK]
+  310 0000002C E7FE            B                .
+  311 0000002E                 ENDP
+  312 0000002E         
+  313 0000002E         EXT_INTERROR5_Handler
+                               PROC
+  314 0000002E                 EXPORT           EXT_INTERROR5_Handler          
+ [WEAK]
+  315 0000002E E7FE            B                .
+  316 00000030                 ENDP
+  317 00000030         
+  318 00000030         EXT_INTERROR6_Handler
+                               PROC
+  319 00000030                 EXPORT           EXT_INTERROR6_Handler          
+ [WEAK]
+  320 00000030 E7FE            B                .
+  321 00000032                 ENDP
+  322 00000032         
+  323 00000032         EXT_INTERROR7_Handler
+                               PROC
+  324 00000032                 EXPORT           EXT_INTERROR7_Handler          
+ [WEAK]
+  325 00000032 E7FE            B                .
+  326 00000034                 ENDP
+  327 00000034         
+  328 00000034         IF_ERR_SCR_Handler
+                               PROC
+  329 00000034                 EXPORT           IF_ERR_SCR_Handler             
+
+
+
+ARM Macro Assembler    Page 10 
+
+
+ [WEAK]
+  330 00000034 E7FE            B                .
+  331 00000036                 ENDP
+  332 00000036         
+  333 00000036         IF_FIN_SCR_Handler
+                               PROC
+  334 00000036                 EXPORT           IF_FIN_SCR_Handler             
+ [WEAK]
+  335 00000036 E7FE            B                .
+  336 00000038                 ENDP
+  337 00000038         
+  338 00000038         DMA_ERR_Handler
+                               PROC
+  339 00000038                 EXPORT           DMA_ERR_Handler                
+ [WEAK]
+  340 00000038 E7FE            B                .
+  341 0000003A                 ENDP
+  342 0000003A         
+  343 0000003A         DMA_DONE0_Handler
+                               PROC
+  344 0000003A                 EXPORT           DMA_DONE0_Handler              
+ [WEAK]
+  345 0000003A E7FE            B                .
+  346 0000003C                 ENDP
+  347 0000003C         
+  348 0000003C         DMA_DONE1_Handler
+                               PROC
+  349 0000003C                 EXPORT           DMA_DONE1_Handler              
+ [WEAK]
+  350 0000003C E7FE            B                .
+  351 0000003E                 ENDP
+  352 0000003E         
+  353 0000003E         IRQ_PORTA_Handler
+                               PROC
+  354 0000003E                 EXPORT           IRQ_PORTA_Handler              
+ [WEAK]
+  355 0000003E E7FE            B                .
+  356 00000040                 ENDP
+  357 00000040         
+  358 00000040         IRQ_PORTB_Handler
+                               PROC
+  359 00000040                 EXPORT           IRQ_PORTB_Handler              
+ [WEAK]
+  360 00000040 E7FE            B                .
+  361 00000042                 ENDP
+  362 00000042         
+  363 00000042         IRQ_PORTC_Handler
+                               PROC
+  364 00000042                 EXPORT           IRQ_PORTC_Handler              
+ [WEAK]
+  365 00000042 E7FE            B                .
+  366 00000044                 ENDP
+  367 00000044         
+  368 00000044         IRQ_PORTD_Handler
+                               PROC
+  369 00000044                 EXPORT           IRQ_PORTD_Handler              
+ [WEAK]
+  370 00000044 E7FE            B                .
+  371 00000046                 ENDP
+
+
+
+ARM Macro Assembler    Page 11 
+
+
+  372 00000046         
+  373 00000046         IRQ_PORTE_Handler
+                               PROC
+  374 00000046                 EXPORT           IRQ_PORTE_Handler              
+ [WEAK]
+  375 00000046 E7FE            B                .
+  376 00000048                 ENDP
+  377 00000048         
+  378 00000048         IRQ_PORTF_Handler
+                               PROC
+  379 00000048                 EXPORT           IRQ_PORTF_Handler              
+ [WEAK]
+  380 00000048 E7FE            B                .
+  381 0000004A                 ENDP
+  382 0000004A         
+  383 0000004A         INT_ETH0_Handler
+                               PROC
+  384 0000004A                 EXPORT           INT_ETH0_Handler               
+ [WEAK]
+  385 0000004A E7FE            B                .
+  386 0000004C                 ENDP
+  387 0000004C         
+  388 0000004C         INT_ETH1_Handler
+                               PROC
+  389 0000004C                 EXPORT           INT_ETH1_Handler               
+ [WEAK]
+  390 0000004C E7FE            B                .
+  391 0000004E                 ENDP
+  392 0000004E         
+  393 0000004E         INT_SPW0_Handler
+                               PROC
+  394 0000004E                 EXPORT           INT_SPW0_Handler               
+ [WEAK]
+  395 0000004E E7FE            B                .
+  396 00000050                 ENDP
+  397 00000050         
+  398 00000050         INT_SPW1_Handler
+                               PROC
+  399 00000050                 EXPORT           INT_SPW1_Handler               
+ [WEAK]
+  400 00000050 E7FE            B                .
+  401 00000052                 ENDP
+  402 00000052         
+  403 00000052         INT_TMR0_Handler
+                               PROC
+  404 00000052                 EXPORT           INT_TMR0_Handler               
+ [WEAK]
+  405 00000052 E7FE            B                .
+  406 00000054                 ENDP
+  407 00000054         
+  408 00000054         INT_TMR1_Handler
+                               PROC
+  409 00000054                 EXPORT           INT_TMR1_Handler               
+ [WEAK]
+  410 00000054 E7FE            B                .
+  411 00000056                 ENDP
+  412 00000056         
+  413 00000056         INT_TMR2_Handler
+                               PROC
+
+
+
+ARM Macro Assembler    Page 12 
+
+
+  414 00000056                 EXPORT           INT_TMR2_Handler               
+ [WEAK]
+  415 00000056 E7FE            B                .
+  416 00000058                 ENDP
+  417 00000058         
+  418 00000058         INT_TMR3_Handler
+                               PROC
+  419 00000058                 EXPORT           INT_TMR3_Handler               
+ [WEAK]
+  420 00000058 E7FE            B                .
+  421 0000005A                 ENDP
+  422 0000005A         
+  423 0000005A         INT_TMR4_Handler
+                               PROC
+  424 0000005A                 EXPORT           INT_TMR4_Handler               
+ [WEAK]
+  425 0000005A E7FE            B                .
+  426 0000005C                 ENDP
+  427 0000005C         
+  428 0000005C         INT_TMR5_Handler
+                               PROC
+  429 0000005C                 EXPORT           INT_TMR5_Handler               
+ [WEAK]
+  430 0000005C E7FE            B                .
+  431 0000005E                 ENDP
+  432 0000005E         
+  433 0000005E         INT_CAN0_Handler
+                               PROC
+  434 0000005E                 EXPORT           INT_CAN0_Handler               
+ [WEAK]
+  435 0000005E E7FE            B                .
+  436 00000060                 ENDP
+  437 00000060         
+  438 00000060         INT_CAN1_Handler
+                               PROC
+  439 00000060                 EXPORT           INT_CAN1_Handler               
+ [WEAK]
+  440 00000060 E7FE            B                .
+  441 00000062                 ENDP
+  442 00000062         
+  443 00000062         INT_CAN2_Handler
+                               PROC
+  444 00000062                 EXPORT           INT_CAN2_Handler               
+ [WEAK]
+  445 00000062 E7FE            B                .
+  446 00000064                 ENDP
+  447 00000064         
+  448 00000064         INT_CAN3_Handler
+                               PROC
+  449 00000064                 EXPORT           INT_CAN3_Handler               
+ [WEAK]
+  450 00000064 E7FE            B                .
+  451 00000066                 ENDP
+  452 00000066         
+  453 00000066         INT_CAN4_Handler
+                               PROC
+  454 00000066                 EXPORT           INT_CAN4_Handler               
+ [WEAK]
+  455 00000066 E7FE            B                .
+
+
+
+ARM Macro Assembler    Page 13 
+
+
+  456 00000068                 ENDP
+  457 00000068         
+  458 00000068         INT_SSP0_Handler
+                               PROC
+  459 00000068                 EXPORT           INT_SSP0_Handler               
+ [WEAK]
+  460 00000068 E7FE            B                .
+  461 0000006A                 ENDP
+  462 0000006A         
+  463 0000006A         INT_SSP1_Handler
+                               PROC
+  464 0000006A                 EXPORT           INT_SSP1_Handler               
+ [WEAK]
+  465 0000006A E7FE            B                .
+  466 0000006C                 ENDP
+  467 0000006C         
+  468 0000006C         INT_SSP2_Handler
+                               PROC
+  469 0000006C                 EXPORT           INT_SSP2_Handler               
+ [WEAK]
+  470 0000006C E7FE            B                .
+  471 0000006E                 ENDP
+  472 0000006E         
+  473 0000006E         INT_SSP3_Handler
+                               PROC
+  474 0000006E                 EXPORT           INT_SSP3_Handler               
+ [WEAK]
+  475 0000006E E7FE            B                .
+  476 00000070                 ENDP
+  477 00000070         
+  478 00000070         INT_UART0_Handler
+                               PROC
+  479 00000070                 EXPORT           INT_UART0_Handler              
+ [WEAK]
+  480 00000070 E7FE            B                .
+  481 00000072                 ENDP
+  482 00000072         
+  483 00000072         INT_UART1_Handler
+                               PROC
+  484 00000072                 EXPORT           INT_UART1_Handler              
+ [WEAK]
+  485 00000072 E7FE            B                .
+  486 00000074                 ENDP
+  487 00000074         
+  488 00000074         INT_UART2_Handler
+                               PROC
+  489 00000074                 EXPORT           INT_UART2_Handler              
+ [WEAK]
+  490 00000074 E7FE            B                .
+  491 00000076                 ENDP
+  492 00000076         
+  493 00000076         INT_UART3_Handler
+                               PROC
+  494 00000076                 EXPORT           INT_UART3_Handler              
+ [WEAK]
+  495 00000076 E7FE            B                .
+  496 00000078                 ENDP
+  497 00000078         
+  498 00000078         INT_USB_Handler
+
+
+
+ARM Macro Assembler    Page 14 
+
+
+                               PROC
+  499 00000078                 EXPORT           INT_USB_Handler                
+ [WEAK]
+  500 00000078 E7FE            B                .
+  501 0000007A                 ENDP
+  502 0000007A         
+  503 0000007A         INT_RX_ARC0_Handler
+                               PROC
+  504 0000007A                 EXPORT           INT_RX_ARC0_Handler            
+ [WEAK]
+  505 0000007A E7FE            B                .
+  506 0000007C                 ENDP
+  507 0000007C         
+  508 0000007C         INT_TX_ARC0_Handler
+                               PROC
+  509 0000007C                 EXPORT           INT_TX_ARC0_Handler            
+ [WEAK]
+  510 0000007C E7FE            B                .
+  511 0000007E                 ENDP
+  512 0000007E         
+  513 0000007E         INT_RX_ARC1_Handler
+                               PROC
+  514 0000007E                 EXPORT           INT_RX_ARC1_Handler            
+ [WEAK]
+  515 0000007E E7FE            B                .
+  516 00000080                 ENDP
+  517 00000080         
+  518 00000080         INT_TX_ARC1_Handler
+                               PROC
+  519 00000080                 EXPORT           INT_TX_ARC1_Handler            
+ [WEAK]
+  520 00000080 E7FE            B                .
+  521 00000082                 ENDP
+  522 00000082         
+  523 00000082         INT_MIL0_Handler
+                               PROC
+  524 00000082                 EXPORT           INT_MIL0_Handler               
+ [WEAK]
+  525 00000082 E7FE            B                .
+  526 00000084                 ENDP
+  527 00000084         
+  528 00000084         INT_MIL1_Handler
+                               PROC
+  529 00000084                 EXPORT           INT_MIL1_Handler               
+ [WEAK]
+  530 00000084 E7FE            B                .
+  531 00000086                 ENDP
+  532 00000086         
+  533 00000086         INT_ADC0_Handler
+                               PROC
+  534 00000086                 EXPORT           INT_ADC0_Handler               
+ [WEAK]
+  535 00000086 E7FE            B                .
+  536 00000088                 ENDP
+  537 00000088         
+  538 00000088         INT_ADC1_Handler
+                               PROC
+  539 00000088                 EXPORT           INT_ADC1_Handler               
+ [WEAK]
+
+
+
+ARM Macro Assembler    Page 15 
+
+
+  540 00000088 E7FE            B                .
+  541 0000008A                 ENDP
+  542 0000008A         
+  543 0000008A         INT_DAC0_Handler
+                               PROC
+  544 0000008A                 EXPORT           INT_DAC0_Handler               
+ [WEAK]
+  545 0000008A E7FE            B                .
+  546 0000008C                 ENDP
+  547 0000008C         
+  548 0000008C         INT_DAC1_Handler
+                               PROC
+  549 0000008C                 EXPORT           INT_DAC1_Handler               
+ [WEAK]
+  550 0000008C E7FE            B                .
+  551 0000008E                 ENDP
+  552 0000008E         
+  553 0000008E         INT_CRYPTO_Handler
+                               PROC
+  554 0000008E                 EXPORT           INT_CRYPTO_Handler             
+ [WEAK]
+  555 0000008E E7FE            B                .
+  556 00000090                 ENDP
+  557 00000090         
+  558 00000090         INT_CRC_Handler
+                               PROC
+  559 00000090                 EXPORT           INT_CRC_Handler                
+ [WEAK]
+  560 00000090 E7FE            B                .
+  561 00000092                 ENDP
+  562 00000092         
+  563 00000092         INT_ECC_Handler
+                               PROC
+  564 00000092                 EXPORT           INT_ECC_Handler                
+ [WEAK]
+  565 00000092 E7FE            B                .
+  566 00000094                 ENDP
+  567 00000094         
+  568 00000094                 ALIGN
+  569 00000094         
+  570 00000094         
+  571 00000094         
+  572 00000094         ; User Initial Stack & Heap
+  573 00000094         
+  574 00000094                 IF               :DEF:__MICROLIB
+  581 00000094         
+  582 00000094                 IMPORT           __use_two_region_memory
+  583 00000094                 EXPORT           __user_initial_stackheap
+  584 00000094         __user_initial_stackheap
+  585 00000094         
+  586 00000094 4803            LDR              R0, =  Heap_Mem
+  587 00000096 4904            LDR              R1, =(Stack_Mem + Stack_Size)
+  588 00000098 4A04            LDR              R2, = (Heap_Mem +  Heap_Size)
+  589 0000009A 4B05            LDR              R3, = Stack_Mem
+  590 0000009C 4770            BX               LR
+  591 0000009E         
+  592 0000009E 00 00           ALIGN
+  593 000000A0         
+  594 000000A0                 ENDIF
+
+
+
+ARM Macro Assembler    Page 16 
+
+
+  595 000000A0         
+  596 000000A0         
+  597 000000A0                 END
+              00000000 
+              00000000 
+              00000400 
+              00000400 
+              00000000 
+Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4 --apcs=interw
+ork --depend=.\objs\startup_mdr1986ve8t.d -o.\objs\startup_mdr1986ve8t.o -IC:\K
+eil_v5\ARM\RV31\INC -IC:\Keil_v5\ARM\CMSIS\Include --predefine="__UVISION_VERSI
+ON SETA 522" --list=.\objs\startup_mdr1986ve8t.lst Sources\1986ve8_lib\startup_
+MDR1986VE8T.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+STACK 00000000
+
+Symbol: STACK
+   Definitions
+      At line 20 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      None
+Comment: STACK unused
+Stack_Mem 00000000
+
+Symbol: Stack_Mem
+   Definitions
+      At line 21 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 587 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 589 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+__initial_sp 00000400
+
+Symbol: __initial_sp
+   Definitions
+      At line 22 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 47 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+Comment: __initial_sp used once
+3 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+HEAP 00000000
+
+Symbol: HEAP
+   Definitions
+      At line 32 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      None
+Comment: HEAP unused
+Heap_Mem 00000000
+
+Symbol: Heap_Mem
+   Definitions
+      At line 34 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 586 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 588 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+__heap_base 00000000
+
+Symbol: __heap_base
+   Definitions
+      At line 33 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      None
+Comment: __heap_base unused
+__heap_limit 00000400
+
+Symbol: __heap_limit
+   Definitions
+      At line 35 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      None
+Comment: __heap_limit unused
+4 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+RESET 00000000
+
+Symbol: RESET
+   Definitions
+      At line 42 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      None
+Comment: RESET unused
+__Vectors 00000000
+
+Symbol: __Vectors
+   Definitions
+      At line 47 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 43 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 191 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+__Vectors_End 00000238
+
+Symbol: __Vectors_End
+   Definitions
+      At line 189 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 44 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 191 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+3 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+.text 00000000
+
+Symbol: .text
+   Definitions
+      At line 193 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      None
+Comment: .text unused
+BKP_IF_Handler 00000022
+
+Symbol: BKP_IF_Handler
+   Definitions
+      At line 283 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 102 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 284 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+BusFault_Handler 0000000A
+
+Symbol: BusFault_Handler
+   Definitions
+      At line 223 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 52 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 224 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+CLK_IF_Handler 0000001C
+
+Symbol: CLK_IF_Handler
+   Definitions
+      At line 268 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 99 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 269 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+DMA_DONE0_Handler 0000003A
+
+Symbol: DMA_DONE0_Handler
+   Definitions
+      At line 343 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 114 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 344 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+DMA_DONE1_Handler 0000003C
+
+Symbol: DMA_DONE1_Handler
+   Definitions
+      At line 348 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 115 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 349 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+DMA_ERR_Handler 00000038
+
+Symbol: DMA_ERR_Handler
+   Definitions
+      At line 338 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+
+
+
+ARM Macro Assembler    Page 2 Alphabetic symbol ordering
+Relocatable symbols
+
+      At line 113 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 339 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+EXT_INTERROR0_Handler 00000024
+
+Symbol: EXT_INTERROR0_Handler
+   Definitions
+      At line 288 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 103 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 289 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+EXT_INTERROR1_Handler 00000026
+
+Symbol: EXT_INTERROR1_Handler
+   Definitions
+      At line 293 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 104 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 294 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+EXT_INTERROR2_Handler 00000028
+
+Symbol: EXT_INTERROR2_Handler
+   Definitions
+      At line 298 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 105 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 299 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+EXT_INTERROR3_Handler 0000002A
+
+Symbol: EXT_INTERROR3_Handler
+   Definitions
+      At line 303 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 106 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 304 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+EXT_INTERROR4_Handler 0000002C
+
+Symbol: EXT_INTERROR4_Handler
+   Definitions
+      At line 308 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 107 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 309 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+EXT_INTERROR5_Handler 0000002E
+
+Symbol: EXT_INTERROR5_Handler
+   Definitions
+      At line 313 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 108 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 314 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+EXT_INTERROR6_Handler 00000030
+
+
+
+
+ARM Macro Assembler    Page 3 Alphabetic symbol ordering
+Relocatable symbols
+
+Symbol: EXT_INTERROR6_Handler
+   Definitions
+      At line 318 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 109 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 319 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+EXT_INTERROR7_Handler 00000032
+
+Symbol: EXT_INTERROR7_Handler
+   Definitions
+      At line 323 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 110 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 324 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+FT_IF0_Handler 00000014
+
+Symbol: FT_IF0_Handler
+   Definitions
+      At line 248 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 95 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 249 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+FT_IF1_Handler 00000016
+
+Symbol: FT_IF1_Handler
+   Definitions
+      At line 253 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 96 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 254 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+FT_IF2_Handler 00000018
+
+Symbol: FT_IF2_Handler
+   Definitions
+      At line 258 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 97 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 259 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+FT_IF3_Handler 0000001A
+
+Symbol: FT_IF3_Handler
+   Definitions
+      At line 263 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 98 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 264 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+HardFault_Handler 00000006
+
+Symbol: HardFault_Handler
+   Definitions
+      At line 213 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 50 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+
+
+ARM Macro Assembler    Page 4 Alphabetic symbol ordering
+Relocatable symbols
+
+      At line 214 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+IF_ERR_SCR_Handler 00000034
+
+Symbol: IF_ERR_SCR_Handler
+   Definitions
+      At line 328 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 111 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 329 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+IF_FIN_SCR_Handler 00000036
+
+Symbol: IF_FIN_SCR_Handler
+   Definitions
+      At line 333 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 112 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 334 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_ADC0_Handler 00000086
+
+Symbol: INT_ADC0_Handler
+   Definitions
+      At line 533 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 182 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 534 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_ADC1_Handler 00000088
+
+Symbol: INT_ADC1_Handler
+   Definitions
+      At line 538 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 183 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 539 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_CAN0_Handler 0000005E
+
+Symbol: INT_CAN0_Handler
+   Definitions
+      At line 433 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 162 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 434 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_CAN1_Handler 00000060
+
+Symbol: INT_CAN1_Handler
+   Definitions
+      At line 438 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 163 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 439 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_CAN2_Handler 00000062
+
+Symbol: INT_CAN2_Handler
+
+
+
+ARM Macro Assembler    Page 5 Alphabetic symbol ordering
+Relocatable symbols
+
+   Definitions
+      At line 443 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 164 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 444 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_CAN3_Handler 00000064
+
+Symbol: INT_CAN3_Handler
+   Definitions
+      At line 448 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 165 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 449 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_CAN4_Handler 00000066
+
+Symbol: INT_CAN4_Handler
+   Definitions
+      At line 453 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 166 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 454 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_CRC_Handler 00000090
+
+Symbol: INT_CRC_Handler
+   Definitions
+      At line 558 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 187 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 559 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_CRYPTO_Handler 0000008E
+
+Symbol: INT_CRYPTO_Handler
+   Definitions
+      At line 553 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 186 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 554 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_DAC0_Handler 0000008A
+
+Symbol: INT_DAC0_Handler
+   Definitions
+      At line 543 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 184 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 544 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_DAC1_Handler 0000008C
+
+Symbol: INT_DAC1_Handler
+   Definitions
+      At line 548 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 185 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 549 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+
+
+ARM Macro Assembler    Page 6 Alphabetic symbol ordering
+Relocatable symbols
+
+
+INT_ECC_Handler 00000092
+
+Symbol: INT_ECC_Handler
+   Definitions
+      At line 563 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 188 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 564 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_ETH0_Handler 0000004A
+
+Symbol: INT_ETH0_Handler
+   Definitions
+      At line 383 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 152 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 384 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_ETH1_Handler 0000004C
+
+Symbol: INT_ETH1_Handler
+   Definitions
+      At line 388 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 153 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 389 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_MIL0_Handler 00000082
+
+Symbol: INT_MIL0_Handler
+   Definitions
+      At line 523 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 180 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 524 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_MIL1_Handler 00000084
+
+Symbol: INT_MIL1_Handler
+   Definitions
+      At line 528 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 181 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 529 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_RX_ARC0_Handler 0000007A
+
+Symbol: INT_RX_ARC0_Handler
+   Definitions
+      At line 503 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 176 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 504 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_RX_ARC1_Handler 0000007E
+
+Symbol: INT_RX_ARC1_Handler
+   Definitions
+
+
+
+ARM Macro Assembler    Page 7 Alphabetic symbol ordering
+Relocatable symbols
+
+      At line 513 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 178 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 514 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_SPW0_Handler 0000004E
+
+Symbol: INT_SPW0_Handler
+   Definitions
+      At line 393 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 154 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 394 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_SPW1_Handler 00000050
+
+Symbol: INT_SPW1_Handler
+   Definitions
+      At line 398 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 155 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 399 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_SSP0_Handler 00000068
+
+Symbol: INT_SSP0_Handler
+   Definitions
+      At line 458 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 167 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 459 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_SSP1_Handler 0000006A
+
+Symbol: INT_SSP1_Handler
+   Definitions
+      At line 463 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 168 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 464 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_SSP2_Handler 0000006C
+
+Symbol: INT_SSP2_Handler
+   Definitions
+      At line 468 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 169 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 469 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_SSP3_Handler 0000006E
+
+Symbol: INT_SSP3_Handler
+   Definitions
+      At line 473 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 170 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 474 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+
+
+
+ARM Macro Assembler    Page 8 Alphabetic symbol ordering
+Relocatable symbols
+
+INT_TMR0_Handler 00000052
+
+Symbol: INT_TMR0_Handler
+   Definitions
+      At line 403 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 156 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 404 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_TMR1_Handler 00000054
+
+Symbol: INT_TMR1_Handler
+   Definitions
+      At line 408 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 157 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 409 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_TMR2_Handler 00000056
+
+Symbol: INT_TMR2_Handler
+   Definitions
+      At line 413 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 158 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 414 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_TMR3_Handler 00000058
+
+Symbol: INT_TMR3_Handler
+   Definitions
+      At line 418 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 159 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 419 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_TMR4_Handler 0000005A
+
+Symbol: INT_TMR4_Handler
+   Definitions
+      At line 423 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 160 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 424 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_TMR5_Handler 0000005C
+
+Symbol: INT_TMR5_Handler
+   Definitions
+      At line 428 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 161 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 429 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_TX_ARC0_Handler 0000007C
+
+Symbol: INT_TX_ARC0_Handler
+   Definitions
+      At line 508 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+
+
+ARM Macro Assembler    Page 9 Alphabetic symbol ordering
+Relocatable symbols
+
+   Uses
+      At line 177 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 509 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_TX_ARC1_Handler 00000080
+
+Symbol: INT_TX_ARC1_Handler
+   Definitions
+      At line 518 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 179 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 519 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_UART0_Handler 00000070
+
+Symbol: INT_UART0_Handler
+   Definitions
+      At line 478 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 171 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 479 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_UART1_Handler 00000072
+
+Symbol: INT_UART1_Handler
+   Definitions
+      At line 483 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 172 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 484 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_UART2_Handler 00000074
+
+Symbol: INT_UART2_Handler
+   Definitions
+      At line 488 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 173 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 489 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_UART3_Handler 00000076
+
+Symbol: INT_UART3_Handler
+   Definitions
+      At line 493 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 174 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 494 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+INT_USB_Handler 00000078
+
+Symbol: INT_USB_Handler
+   Definitions
+      At line 498 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 175 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 499 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+IRQ_PORTA_Handler 0000003E
+
+
+
+ARM Macro Assembler    Page 10 Alphabetic symbol ordering
+Relocatable symbols
+
+
+Symbol: IRQ_PORTA_Handler
+   Definitions
+      At line 353 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 146 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 354 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+IRQ_PORTB_Handler 00000040
+
+Symbol: IRQ_PORTB_Handler
+   Definitions
+      At line 358 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 147 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 359 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+IRQ_PORTC_Handler 00000042
+
+Symbol: IRQ_PORTC_Handler
+   Definitions
+      At line 363 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 148 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 364 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+IRQ_PORTD_Handler 00000044
+
+Symbol: IRQ_PORTD_Handler
+   Definitions
+      At line 368 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 149 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 369 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+IRQ_PORTE_Handler 00000046
+
+Symbol: IRQ_PORTE_Handler
+   Definitions
+      At line 373 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 150 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 374 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+IRQ_PORTF_Handler 00000048
+
+Symbol: IRQ_PORTF_Handler
+   Definitions
+      At line 378 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 151 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 379 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+MemoryMngFault_Handler 00000008
+
+Symbol: MemoryMngFault_Handler
+   Definitions
+      At line 218 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+
+
+
+ARM Macro Assembler    Page 11 Alphabetic symbol ordering
+Relocatable symbols
+
+      At line 51 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 219 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+NMI_Handler 00000004
+
+Symbol: NMI_Handler
+   Definitions
+      At line 208 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 49 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 209 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+PVD_IF_Handler 0000001E
+
+Symbol: PVD_IF_Handler
+   Definitions
+      At line 273 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 100 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 274 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+PendSV_Handler 00000010
+
+Symbol: PendSV_Handler
+   Definitions
+      At line 238 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 61 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 239 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+RTC_IF_Handler 00000020
+
+Symbol: RTC_IF_Handler
+   Definitions
+      At line 278 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 101 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 279 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+Reset_Handler 00000000
+
+Symbol: Reset_Handler
+   Definitions
+      At line 198 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 48 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 199 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+SVCall_Handler 0000000E
+
+Symbol: SVCall_Handler
+   Definitions
+      At line 233 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 58 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 234 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+Systick_Handler 00000012
+
+
+
+
+ARM Macro Assembler    Page 12 Alphabetic symbol ordering
+Relocatable symbols
+
+Symbol: Systick_Handler
+   Definitions
+      At line 243 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 62 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 244 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+UsageFault_Handler 0000000C
+
+Symbol: UsageFault_Handler
+   Definitions
+      At line 228 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 53 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 229 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+__user_initial_stackheap 00000094
+
+Symbol: __user_initial_stackheap
+   Definitions
+      At line 584 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 583 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+Comment: __user_initial_stackheap used once
+75 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Absolute symbols
+
+Heap_Size 00000400
+
+Symbol: Heap_Size
+   Definitions
+      At line 29 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 34 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 588 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+Stack_Size 00000400
+
+Symbol: Stack_Size
+   Definitions
+      At line 18 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 21 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+      At line 587 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+
+__Vectors_Size 00000238
+
+Symbol: __Vectors_Size
+   Definitions
+      At line 191 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 45 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+Comment: __Vectors_Size used once
+3 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+External symbols
+
+__main 00000000
+
+Symbol: __main
+   Definitions
+      At line 200 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      At line 201 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+Comment: __main used once
+__use_two_region_memory 00000000
+
+Symbol: __use_two_region_memory
+   Definitions
+      At line 582 in file Sources\1986ve8_lib\startup_MDR1986VE8T.s
+   Uses
+      None
+Comment: __use_two_region_memory unused
+2 symbols
+425 symbols in table
