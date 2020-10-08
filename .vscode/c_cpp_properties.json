@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "defines": [
+                "_EXT_MEM_RLS_"
+            ],
+            "windowsSdkVersion": "10.0.18362.1",
+            "compilerPath": "C:/Keil_v5/ARM/ARMCLANG/bin/armclang.exe",
+            "cppStandard": "c++17",
+            "cStandard": "c99",
+            "intelliSenseMode": "clang-arm64",
+            "includePath": [
+                "${workspaceFolder}/Sources",
+                "C:/Keil_v5/ARM/ARMCLANG/include"
+            ],
+            "forcedInclude": [
+            ]
+        }
+    ],
+    "version": 4
+}

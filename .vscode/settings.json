@@ -1,3 +1,24 @@
 {
-    "cquery.cacheDirectory": "${workspaceFolder}/.vscode/cquery_cached_index/"
+    "C_Cpp.default.browse.limitSymbolsToIncludedHeaders": true,
+    "C_Cpp.default.cStandard": "c99",
+    "files.associations": {
+        "stdio.h": "c",
+        "string": "c",
+        "usb_device.h": "c",
+        "lm.h": "c",
+        "__config": "c",
+        "cy15b104qn_spi.h": "c",
+        "my_gpio.h": "c",
+        "tim.h": "c",
+        "main.h": "c",
+        "i2c.h": "c",
+        "rtc.h": "c",
+        "spi.h": "c",
+        "usart.h": "c",
+        "limits": "c",
+        "type_traits": "c",
+        "xtr1common": "c",
+        "can_usb_vcp.h": "c",
+        "pn12.h": "c"
+    }
 }

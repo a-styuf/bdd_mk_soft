@@ -10,8 +10,7 @@
 
 
 #ifdef _EXT_MEM_RLS_
-const uint64_t ExtBusCfgCode[] __attribute__ ((at(0x10000400))) = 
-{0x71, 0x71, 0,0,0,0,0,0,0,0};
+const uint64_t ExtBusCfgCode[] __attribute__ ((at(0x10000400))) = {0x71, 0x71, 0,0,0,0,0,0,0,0};
 #endif
 
 
@@ -47,45 +46,36 @@ void System_Init() {
 
   PORTB->KEY = _KEY_;
   PORTB->SANALOG =   0xFFFFFFFF;
+  PORTB->CFUNC[0] =  0x0000FFFF;
+  PORTB->SFUNC[0] =  0x00000000;
   PORTB->CFUNC[1] =  0xFFFFFFF0;
-  PORTB->SFUNC[1] =  0x50000000;  
-  PORTB->CFUNC[2] =  0x000000FF;
-  PORTB->SFUNC[2] =  0x00000005;
-  PORTB->CFUNC[3] =  0xFF000000;
-  PORTB->SRXTX =     (1<<17)|(1<<30)|((uint32_t)1<<31);
-  PORTB->SOE =       (1<<15)|(1<<17)|(1<<30)|((uint32_t)1<<31);
+  PORTB->SFUNC[1] =  0x50000000;  // UART0
+  PORTB->CFUNC[2] =  0xFF00000F;
+  PORTB->SFUNC[2] =  0x99000005;
   PORTB->SPWR[0] =   0x80000000;
-  PORTB->SPWR[1] =   0x50000004;
-  PORTB->SPULLDOWN = 0x3FFC003E;
-  PORTB->SPULLUP   = 0x00007EC0;
+  PORTB->SPWR[1] =   0x0000A002;
+  PORTB->SPULLDOWN = 0x00C00000;
+  PORTB->SPULLUP   = 0x0001860F;
 
   PORTC->KEY = _KEY_;
-  PORTC->SANALOG =   0xFFFF80FF;
-  PORTC->CANALOG =   0x00007F00;
-  PORTC->CFUNC[1] =  0x0FFFFFFF;
-  PORTC->SPWR[1] =   0xF0000000;
-  PORTC->SPULLDOWN = 0x3FFF80FF;
+  PORTC->SANALOG =   0xEDFC00FF;
+  PORTC->CANALOG =   0x0203FF00;
+  PORTC->CFUNC[0] =  0xFFFFFFFF;
+  PORTB->SFUNC[0] =  0x00000000;  
+  PORTC->SPULLDOWN = 0x3FFC00FF;
   
   PORTD->KEY = _KEY_;
   PORTD->SANALOG =   0xFFFFFFFF;
-  PORTD->SFUNC[2] =  0x02202000;
-  PORTD->SFUNC[3] =  0x00000002;
-  PORTD->SPWR[0] =   0x3FFFFFFF;
-  PORTD->SPWR[1] =   0xF003FCC0;
-  PORTD->SPULLDOWN = 0x3E178000;
+  PORTD->SPWR[0] =   0x0FFFFFFF;
+  PORTD->SPWR[1] =   0xF003C3C0;
+  PORTD->SPULLDOWN = 0x3E97E000;
   
   PORTE->KEY = _KEY_;
   PORTE->SANALOG =   0xFFFFFFFF;
-  PORTE->CFUNC[1] =  0xFFFFFFFF;
+  PORTE->CFUNC[1] =  0xFFFFFF00;
   PORTE->CFUNC[2] =  0xFFFFFFFF;
   PORTE->CFUNC[3] =  0xFFFFFFFF;
-  PORTE->CRXTX =     0x00F10000;
-  PORTE->SRXTX =     0x000E0000;
-  PORTE->SPD =       (1<<17)|(1<<18)|(1<<19);
-  PORTE->SOE =       0x00FF0000;
-  PORTE->SPWR[0] =   0x00000FFF;
-  PORTE->SPWR[1] =   0x00005555;
-  PORTE->SPULLDOWN = 0xFF00FFC0;
+  PORTE->SPULLDOWN = 0xFFFFFFC0;
 
   /*------------ enable regions -----------*/
   EXT_BUS_CNTR->KEY = _KEY_;
@@ -103,6 +93,7 @@ void System_Init() {
 
   /*---------- Clock for ADC0 -------------*/
   CLK_CNTR->ADC0_CLK = ((uint32_t)1<<28)|(1<<16)| 7;  //HSE0 clock for ADC, freq=0.5 MHz
+  CLK_CNTR->DAC0_CLK = ((uint32_t)1<<28)|(1<<16)| 7;  //HSE0 clock for DAC, freq=0.5 MHz
 
 #ifndef _INT_RAM_
   ICACHE->KEY = _KEY_;
