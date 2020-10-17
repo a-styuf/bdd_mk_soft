@@ -988,10 +988,13 @@ ARM Macro Assembler    Page 16
               00000400 
               00000000 
 Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4 --apcs=interw
-ork --depend=.\objs\startup_mdr1986ve8t.d -o.\objs\startup_mdr1986ve8t.o -IC:\K
-eil_v5\ARM\RV31\INC -IC:\Keil_v5\ARM\CMSIS\Include --predefine="__UVISION_VERSI
-ON SETA 522" --list=.\objs\startup_mdr1986ve8t.lst Sources\1986ve8_lib\startup_
-MDR1986VE8T.s
+ork --depend=.\objs\startup_mdr1986ve8t.d -o.\objs\startup_mdr1986ve8t.o -I.\RT
+E\_Target__ExtMEM_Dbg_ -IC:\Users\a-sty\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0
+\CMSIS\Core\Include -IC:\Users\a-sty\AppData\Local\Arm\Packs\Keil\MDR1986VE8T\0
+.4.1\Libraries\CMSIS\CM4\DeviceSupport\MDR32F8\inc --predefine="__UVISION_VERSI
+ON SETA 532" --predefine="_RTE_ SETA 1" --predefine="USE_MDR32F8 SETA 1" --pred
+efine="_RTE_ SETA 1" --list=.\objs\startup_mdr1986ve8t.lst Sources\1986ve8_lib\
+startup_MDR1986VE8T.s
 
 
 
@@ -1899,4 +1902,4 @@ Symbol: __use_two_region_memory
       None
 Comment: __use_two_region_memory unused
 2 symbols
-425 symbols in table
+427 symbols in table

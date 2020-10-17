@@ -4,9 +4,11 @@
 ".\objs\uarts.o"
 ".\objs\wdt.o"
 ".\objs\debug.o"
+".\objs\adc.o"
+".\objs\timers.o"
 ".\objs\core_cm4.o"
 ".\objs\startup_mdr1986ve8t.o"
 --strict --scatter ".\Objs\1986ve8_proj.sct"
---summary_stderr --info summarysizes --map --xref --callgraph --symbols
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers
 --list ".\Objs\1986ve8_proj.map" -o .\Objs\1986ve8_proj.axf

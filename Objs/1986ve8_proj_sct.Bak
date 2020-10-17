@@ -7,14 +7,15 @@ LR_ROM1 0x10000000 0x00000400  {    ; load region size_region
    *.o (RESET, +First)
    *(InRoot$$Sections)
    .ANY (+RO)
+   .ANY (+XO)
   }
-  RW_IRAM1 0x20000000 0x00008000  {  ; RW data
+  RW_IRAM1 0x20000000 UNINIT 0x00008000  {  ; RW data
    .ANY (+RW +ZI)
   }
 }
 
-LR_ROM2 0x10000500 0x00007B00  {
-  ER_ROM2 0x10000500 0x00007B00  {  ; load address = execution address
+LR_ROM2 0x10000500 0x00004000  {
+  ER_ROM2 0x10000500 0x00004000  {  ; load address = execution address
    .ANY (+RO)
   }
 }
