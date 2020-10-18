@@ -7,9 +7,11 @@
 #include "debug.h"
 #include "timers.h"
 #include "adc.h"
+#include "dac.h"
 
 
 extern type_ADC_model adc_0;
+extern type_DAC_model dac;
 //
 uint8_t n;
 float var_float = 0;
@@ -23,6 +25,7 @@ int main() {
 	Timers_Init();
 	//
 	adc_init(&adc_0);
+	dac_init(&dac);
 	
 	Timers_Start(0, 1000);
 	
@@ -34,12 +37,14 @@ int main() {
 			Timers_Start(0, 1000); // перезапускаем таймер для формирования слота времени (возможная проблема - пропуск слота)
 			//обработка процессов
 			adc_process(&adc_0, 1000);
+			dac_set_voltage(&dac, 0, adc_get_ch_voltage(&adc_0, 0));
+			dac_set_voltage(&dac, 1, adc_get_ch_voltage(&adc_0, 0));
 			//
 			for(n=0; n<10; n++){
-
-				printf("%d: %6.2f; ", n, adc_get_ch_voltage(&adc_0, n));
+				printf("%d: %4.2f; ", n, adc_get_ch_voltage(&adc_0, n));
 			}
 			printf("temp:%+2.1f", get_mcu_temp(&adc_0));
+			//
 		}
 	}
 }

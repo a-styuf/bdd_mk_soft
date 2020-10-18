@@ -93,7 +93,8 @@ void System_Init() {
 
   /*---------- Clock for ADC0 -------------*/
   CLK_CNTR->ADC0_CLK = ((uint32_t)1<<28)|(1<<16)| 7;  //HSE0 clock for ADC, freq=0.5 MHz
-  CLK_CNTR->DAC0_CLK = ((uint32_t)1<<28)|(1<<16)| 7;  //HSE0 clock for DAC, freq=0.5 MHz
+  CLK_CNTR->DAC0_CLK = ((uint32_t)1<<28)|(1<<16)| 7;  //HSE0 clock for DAC0, freq=0.5 MHz
+  CLK_CNTR->DAC1_CLK = ((uint32_t)1<<28)|(1<<16)| 7;  //HSE0 clock for DAC1, freq=0.5 MHz
 
 #ifndef _INT_RAM_
   ICACHE->KEY = _KEY_;

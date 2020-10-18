@@ -417,6 +417,11 @@
               <FileType>1</FileType>
               <FilePath>.\Sources\timers.c</FilePath>
             </File>
+            <File>
+              <FileName>dac.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\dac.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -851,6 +856,11 @@
               <FileType>1</FileType>
               <FilePath>.\Sources\timers.c</FilePath>
             </File>
+            <File>
+              <FileName>dac.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\dac.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1284,6 +1294,11 @@
               <FileName>timers.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Sources\timers.c</FilePath>
+            </File>
+            <File>
+              <FileName>dac.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\dac.c</FilePath>
             </File>
           </Files>
         </Group>

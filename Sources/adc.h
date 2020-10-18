@@ -1,6 +1,8 @@
 #ifndef _ADC_H_
 #define _ADC_H_
 
+#include "1986ve8_lib/cm4ikmcu.h"
+
 #define IRQn_ADC0 (IRQn_Type)119
 
 #define ADC0_CHAN_NUM 24

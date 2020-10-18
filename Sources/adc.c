@@ -1,4 +1,3 @@
-#include "1986ve8_lib/cm4ikmcu.h"
 #include "adc.h"
 
 type_ADC_model adc_0;
@@ -113,9 +112,9 @@ void adc_process(type_ADC_model* adc_ptr, uint16_t period_ms)
   */
 float adc_get_ch_voltage(type_ADC_model* adc_ptr, uint8_t ch_num)
 {
-  volatile float adc_coltage = 0;
-  adc_coltage = adc_ptr->ch[ch_num].voltage;
-  return adc_coltage;
+  volatile float adc_voltage = 0;
+  adc_voltage = adc_ptr->ch[ch_num].voltage;
+  return adc_voltage;
 }
 
 /**
