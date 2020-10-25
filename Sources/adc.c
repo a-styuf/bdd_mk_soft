@@ -6,9 +6,8 @@
 void adc_init(type_ADC_model* adc_ptr)
 {
   int i, sm;
-	float cal_a[64] = ADC_CHAN_CAL_COEF_A;
-  float cal_b[64] = ADC_CHAN_CAL_COEF_B;
-  memset((uint8_t*)adc_ptr, 0x00, sizeof(type_ADC_model));
+	float cal_a[32] = ADC_CHAN_CAL_COEF_A;
+  float cal_b[32] = ADC_CHAN_CAL_COEF_B;
   CLK_CNTR->KEY = _KEY_;
   CLK_CNTR->PER1_CLK |= (1<<23);  //clock ADC0
   //
@@ -105,14 +104,14 @@ void adc_process(type_ADC_model* adc_ptr, uint16_t period_ms)
 
 /**
   * @brief  запрос напряжения канала
-  * @param  adc_ptr указатель на програмную модель устройства
+  * @param  adc_ch_ptr указатель на програмную модель канала АЦП
   * @param  ch_num номер необходимого канала
 	* @retval значение напряжения на входе АЦП
   */
-float adc_get_ch_voltage(type_ADC_model* adc_ptr, uint8_t ch_num)
+float adc_get_ch_voltage(type_ADC_channel* adc_ch_ptr)
 {
   volatile float adc_voltage = 0;
-  adc_voltage = adc_ptr->ch[ch_num].voltage;
+  adc_voltage = adc_ch_ptr->voltage;
   return adc_voltage;
 }
 

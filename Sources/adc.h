@@ -48,7 +48,7 @@ void adc_set_ch_a_b(type_ADC_model* adc_ptr, float *a, float *b);
 float adc_ch_voltage(type_ADC_model* adc_ptr, uint8_t ch_num);
 float calc_mcu_temp(type_ADC_model* adc_ptr);
 void adc_process(type_ADC_model* adc_ptr, uint16_t period_ms);
-float adc_get_ch_voltage(type_ADC_model* adc_ptr, uint8_t ch_num);
+float adc_get_ch_voltage(type_ADC_channel* adc_ch_ptr);
 float get_mcu_temp(type_ADC_model* adc_ptr);
 //
 void INT_ADC0_Handler(void);

@@ -9,6 +9,7 @@
 #include "adc.h"
 #include "dac.h"
 #include "gpio.h"
+//#include "termo_res.h"
 
 
 
@@ -39,6 +40,9 @@ int main() {
 	ku_gpio[1].num = 19;
 	ku_gpio[1].port = PORTE;
 	gpio_set(&ku_gpio[1], 0);
+	//tres_init(&tres_ims, &adc_0.ch[1]);
+	//tres_init(&tres_pirani_1, &adc_0.ch[4]);
+	//tres_init(&tres_pirani_2, &adc_0.ch[7]);
 	
 	Timers_Start(0, 1000);
 	
@@ -50,8 +54,9 @@ int main() {
 			Timers_Start(0, 1000); // перезапускаем таймер для формирования слота времени (возможная проблема - пропуск слота)
 			//обработка процессов
 			adc_process(&adc_0, 1000);
-			dac_set_voltage(&dac, 0, adc_get_ch_voltage(&adc_0, 0));
-			dac_set_voltage(&dac, 1, adc_get_ch_voltage(&adc_0, 0));
+			dac_set_voltage(&dac, 0, adc_get_ch_voltage(&adc_0.ch[n]));
+			dac_set_voltage(&dac, 1, adc_get_ch_voltage(&adc_0.ch[n]));
+			printf("adc0:%5.2f\t", adc_get_ch_voltage(&adc_0.ch[0]));
 			//
 
 			//
@@ -72,6 +77,10 @@ int main() {
 				gpio_set(&ku_gpio[0], 0);
 				gpio_set(&ku_gpio[1], 0);
 			}
+			//printf("temp:%+2.1f\t", tres_get_temp(&tres_pirani_1));
+			//printf("temp:%+2.1f\t", tres_get_temp(&tres_pirani_2));
+			//printf("temp:%+2.1f\n", tres_get_temp(&tres_ims));
+			//
 		}
 	}
 }
