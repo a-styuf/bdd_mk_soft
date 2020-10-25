@@ -1,7 +1,5 @@
 #include "dac.h"
 
-type_DAC_model dac;
-
 /**
   * @brief  инициализация ЦАП
   */

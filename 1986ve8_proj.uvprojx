@@ -422,6 +422,11 @@
               <FileType>1</FileType>
               <FilePath>.\Sources\dac.c</FilePath>
             </File>
+            <File>
+              <FileName>gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\gpio.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -861,6 +866,11 @@
               <FileType>1</FileType>
               <FilePath>.\Sources\dac.c</FilePath>
             </File>
+            <File>
+              <FileName>gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\gpio.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1299,6 +1309,11 @@
               <FileName>dac.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Sources\dac.c</FilePath>
+            </File>
+            <File>
+              <FileName>gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\gpio.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -1,7 +1,5 @@
 #include "adc.h"
 
-type_ADC_model adc_0;
-
 /**
   * @brief  инициализация АЦП0
   */
@@ -10,6 +8,7 @@ void adc_init(type_ADC_model* adc_ptr)
   int i, sm;
 	float cal_a[64] = ADC_CHAN_CAL_COEF_A;
   float cal_b[64] = ADC_CHAN_CAL_COEF_B;
+  memset((uint8_t*)adc_ptr, 0x00, sizeof(type_ADC_model));
   CLK_CNTR->KEY = _KEY_;
   CLK_CNTR->PER1_CLK |= (1<<23);  //clock ADC0
   //
@@ -37,7 +36,7 @@ void adc_init(type_ADC_model* adc_ptr)
   adc_set_ch_a_b(adc_ptr, cal_a, cal_b);
   //
   NVIC_EnableIRQ(IRQn_ADC0);
-  //
+  
 }
 
 /**
@@ -133,12 +132,13 @@ float get_mcu_temp(type_ADC_model* adc_ptr)
   * @brief  обработчик прерывания АЦП
   */
 void INT_ADC0_Handler(void) {
-  uint32_t rslt;
-  uint16_t chn, val;
-  while(adc_0.reg->STATUS & 1) {
-    rslt = adc_0.reg->RESULT;
-    chn = *((uint16_t*)&rslt + 1);
-    val = *((uint16_t*)&rslt);
-    adc_0.ch[chn].val = val;
-  }
+  INT_ADC0_CallBack();
+}
+
+/**
+  * @brief  calback от обработчика прерывания АЦП, для описания в main
+  */
+__weak void INT_ADC0_CallBack(void)
+{
+  //
 }

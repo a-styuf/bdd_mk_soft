@@ -7,6 +7,7 @@
 ".\objs\adc.o"
 ".\objs\timers.o"
 ".\objs\dac.o"
+".\objs\gpio.o"
 ".\objs\core_cm4.o"
 ".\objs\startup_mdr1986ve8t.o"
 --strict --scatter ".\Objs\1986ve8_proj.sct"

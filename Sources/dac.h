@@ -7,6 +7,8 @@
 #define DAC_CHAN_CAL_COEF_A {+1.223E+3, +1.223E+3}  // DAC_CODE = a*U(V) + b
 #define DAC_CHAN_CAL_COEF_B {-7.154E+0, -7.154E+0}
 
+#pragma pack (2)
+
 /** 
   * @brief  структура управления каналоми ЦАП
   */
