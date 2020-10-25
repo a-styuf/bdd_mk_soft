@@ -9,17 +9,7 @@
 #include "adc.h"
 #include "dac.h"
 #include "gpio.h"
-<<<<<<< Updated upstream
-//#include "termo_res.h"
-=======
-<<<<<<< HEAD
 #include "termo_res.h"
-=======
-//#include "termo_res.h"
->>>>>>> main
->>>>>>> Stashed changes
-
-
 
 type_ADC_model adc_0;
 type_DAC_model dac;
@@ -53,17 +43,7 @@ int main() {
 	ku_gpio[1].num = 19;
 	ku_gpio[1].port = PORTE;
 	gpio_set(&ku_gpio[1], 0);
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
 	//
-=======
->>>>>>> Stashed changes
-	//tres_init(&tres_ims, &adc_0.ch[1]);
-	//tres_init(&tres_pirani_1, &adc_0.ch[4]);
-	//tres_init(&tres_pirani_2, &adc_0.ch[7]);
-	
->>>>>>> main
 	Timers_Start(0, 1000);
 	
 	printf("BDD_MK is online");
@@ -76,15 +56,6 @@ int main() {
 			adc_process(&adc_0, 1000);
 			dac_set_voltage(&dac, 0, adc_get_ch_voltage(&adc_0.ch[n]));
 			dac_set_voltage(&dac, 1, adc_get_ch_voltage(&adc_0.ch[n]));
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
-=======
->>>>>>> Stashed changes
-			printf("adc0:%5.2f\t", adc_get_ch_voltage(&adc_0.ch[0]));
-			//
-
->>>>>>> main
 			//
 			for(n=0; n<10; n++){
 				printf("%d: %4.2f; ", n, adc_get_ch_voltage(&adc_0.ch[n]));
@@ -97,23 +68,9 @@ int main() {
 			else {
 				gpio_set(&rele_gpio, 1);
 			}
-<<<<<<< Updated upstream
-			//printf("temp:%+2.1f\t", tres_get_temp(&tres_pirani_1));
-			//printf("temp:%+2.1f\t", tres_get_temp(&tres_pirani_2));
-			//printf("temp:%+2.1f\n", tres_get_temp(&tres_ims));
-=======
-<<<<<<< HEAD
-			//
 			printf("pt1:%+2.1f\t", tres_get_temp(&tres_pirani_1));
 			printf("pt2:%+2.1f\t", tres_get_temp(&tres_pirani_2));
 			printf("pt0:%+2.1f\n", tres_get_temp(&tres_ims));
-=======
-			//printf("temp:%+2.1f\t", tres_get_temp(&tres_pirani_1));
-			//printf("temp:%+2.1f\t", tres_get_temp(&tres_pirani_2));
-			//printf("temp:%+2.1f\n", tres_get_temp(&tres_ims));
->>>>>>> main
->>>>>>> Stashed changes
-			//
 		}
 	}
 }
