@@ -30,8 +30,6 @@ typedef struct
   uint8_t adc_ch_num;
 } type_ADC_channel;
 
-
-
 /** 
   * @brief  структура програмная модель АЦП
   */

@@ -7,6 +7,9 @@
 #define DAC_CHAN_CAL_COEF_A {+1.223E+3, +1.223E+3}  // DAC_CODE = a*U(V) + b
 #define DAC_CHAN_CAL_COEF_B {-7.154E+0, -7.154E+0}
 
+#define DAC_MAX_VOLTAGE (3.2)
+#define DAC_MIN_VOLTAGE (0.0)
+
 #pragma pack (2)
 
 /** 
@@ -32,7 +35,9 @@ typedef struct
 void dac_init(type_DAC_model* adc_ptr);
 void dac_set_ch_a_b(type_DAC_model* adc_ptr, float *a, float *b);
 void dac_set_voltage(type_DAC_model* dac_ptr, uint8_t ch_num, float voltage);
+void dac_set_ch_voltage(type_DAC_channel* dac_сh_ptr, float voltage);
 void dac_set_code(type_DAC_model* dac_ptr, uint8_t ch_num, uint16_t code);
+
 #endif
 
 

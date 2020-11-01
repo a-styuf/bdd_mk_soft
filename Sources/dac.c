@@ -27,6 +27,11 @@ void dac_init(type_DAC_model* dac_ptr)
   //
   dac_set_ch_a_b(dac_ptr, cal_a, cal_b);
   //
+  dac_ptr->ch[0].val = 0;
+  dac_ptr->ch[0].voltage = 0.0;
+  dac_ptr->ch[1].val = 0;
+  dac_ptr->ch[1].voltage = 0.0;
+  //
 }
 
 /**
@@ -58,10 +63,28 @@ void dac_set_voltage(type_DAC_model* dac_ptr, uint8_t ch_num, float voltage)
   }
   dac_val = (uint16_t)floor(dac_ptr->ch[ch_num].a * voltage + dac_ptr->ch[ch_num].b);
   if (dac_val > 0xFFF) dac_val = 0x0FFF;
+  dac_ptr->ch[ch_num].val = dac_val;
+  dac_ptr->ch[ch_num].voltage = voltage;
   dac_ptr->ch[ch_num].reg->KEY = _KEY_;
   dac_ptr->ch[ch_num].reg->DATA = dac_val & 0x0FFF;
-  //dac_ptr->ch[ch_num].reg->DATA = 1000;
   dac_ptr->ch[ch_num].reg->KEY = 0x00;
+}
+
+/**
+  * @brief  установка канала ЦАП по укзаателю на канал
+	* @param  dac_сh_ptr указатель на програмную модель канала цап
+	* @param  voltage напряжение на выходе ЦАП
+  */
+void dac_set_ch_voltage(type_DAC_channel* dac_сh_ptr, float voltage)
+{
+  uint16_t dac_val = 0;
+  dac_val = (uint16_t)floor(dac_сh_ptr->a * voltage + dac_сh_ptr->b);
+  if (dac_val > 0xFFF) dac_val = 0x0FFF;
+  dac_сh_ptr->val = dac_val;
+  dac_сh_ptr->voltage = voltage;
+  dac_сh_ptr->reg->KEY = _KEY_;
+  dac_сh_ptr->reg->DATA = dac_val & 0x0FFF;
+  dac_сh_ptr->reg->KEY = 0x00;
 }
 
 /**
@@ -78,6 +101,7 @@ void dac_set_code(type_DAC_model* dac_ptr, uint8_t ch_num, uint16_t code)
   }
   dac_val = code;
   if (dac_val > 0xFFF) dac_val = 0x0FFF;
+  dac_ptr->ch[ch_num].val = dac_val;
   dac_ptr->ch[ch_num].reg->KEY = _KEY_;
   dac_ptr->ch[ch_num].reg->DATA = dac_val & 0x0FFF;
   dac_ptr->ch[ch_num].reg->KEY = 0x00;

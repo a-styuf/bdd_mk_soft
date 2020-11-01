@@ -10,7 +10,7 @@
       <TargetName>Target (IntRAM)</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <uAC6>0</uAC6>
+      <uAC6>8</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>MDR32F8</Device>
@@ -431,6 +431,11 @@
               <FileName>termo_res.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Sources\termo_res.c</FilePath>
+            </File>
+            <File>
+              <FileName>oai_dd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\oai_dd.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -881,6 +886,11 @@
               <FileType>1</FileType>
               <FilePath>.\Sources\termo_res.c</FilePath>
             </File>
+            <File>
+              <FileName>oai_dd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\oai_dd.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -908,7 +918,7 @@
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>5060960::V5.06 update 7 (build 960)::.\ARMCC</pCCUsed>
-      <uAC6>0</uAC6>
+      <uAC6>8</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>MDR32F8</Device>
@@ -1329,6 +1339,11 @@
               <FileName>termo_res.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Sources\termo_res.c</FilePath>
+            </File>
+            <File>
+              <FileName>oai_dd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\oai_dd.c</FilePath>
             </File>
           </Files>
         </Group>

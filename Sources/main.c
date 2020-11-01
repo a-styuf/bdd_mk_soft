@@ -10,15 +10,20 @@
 #include "dac.h"
 #include "gpio.h"
 #include "termo_res.h"
+#include "oai_dd.h"
 
 type_ADC_model adc_0;
 type_DAC_model dac;
-type_SINGLE_GPIO rele_gpio, ku_gpio[2];
 type_TRES_model tres_ims, tres_pirani_1, tres_pirani_2;
+type_OAI_DD_model oai_dd_1, oai_dd_2;
 //
+type_SINGLE_GPIO rele_gpio, ku_gpio[2];
+//
+char report_str[128] = {0};
 uint8_t n, m=0;
 float var_float = 0;
 //
+
 
 int main() {
 	// инициализация переферии
@@ -32,6 +37,8 @@ int main() {
 	tres_init(&tres_ims, &adc_0.ch[1]);
 	tres_init(&tres_pirani_1, &adc_0.ch[4]);
 	tres_init(&tres_pirani_2, &adc_0.ch[7]);
+	oai_dd_init(&oai_dd_1, 1, &tres_pirani_1, &adc_0.ch[2], &adc_0.ch[3], &dac.ch[0], V_A, V_B, I_A, I_B);
+	oai_dd_init(&oai_dd_2, 2, &tres_pirani_2, &adc_0.ch[5], &adc_0.ch[6], &dac.ch[1], V_A, V_B, I_A, I_B);
 	
 	// gpio tmp
 	rele_gpio.num = 20;
@@ -46,7 +53,7 @@ int main() {
 	//
 	Timers_Start(0, 1000);
 	
-	printf("BDD_MK is online");
+	printf("BDD_MK is online\n");
 	while(1) {
 		WDRST;
 		if (Timers_Status(0))
@@ -54,13 +61,13 @@ int main() {
 			Timers_Start(0, 2000); // перезапускаем таймер для формирования слота времени (возможная проблема - пропуск слота)
 			//обработка процессов
 			adc_process(&adc_0, 1000);
-			dac_set_voltage(&dac, 0, adc_get_ch_voltage(&adc_0.ch[n]));
-			dac_set_voltage(&dac, 1, adc_get_ch_voltage(&adc_0.ch[n]));
-			//
-			for(n=0; n<10; n++){
-				printf("%d: %4.2f; ", n, adc_get_ch_voltage(&adc_0.ch[n]));
-			}
-			printf("Tmk:%+2.1f\n", get_mcu_temp(&adc_0));
+			oai_dd_process(&oai_dd_1, 1000);
+			oai_dd_process(&oai_dd_2, 1000);
+			// получение отчета о работе
+			oai_dd_get_str_report(&oai_dd_1, report_str);
+			printf("%s\t", report_str);
+			pid_get_str_report(&oai_dd_1.pid_res, report_str);
+			printf("%s\n", report_str);
 			// проверка работы реле
 			if (gpio_get(&rele_gpio)){
 				gpio_set(&rele_gpio, 0);
@@ -68,9 +75,6 @@ int main() {
 			else {
 				gpio_set(&rele_gpio, 1);
 			}
-			printf("pt1:%+2.1f\t", tres_get_temp(&tres_pirani_1));
-			printf("pt2:%+2.1f\t", tres_get_temp(&tres_pirani_2));
-			printf("pt0:%+2.1f\n", tres_get_temp(&tres_ims));
 		}
 	}
 }

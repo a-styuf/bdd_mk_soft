@@ -9,12 +9,11 @@
 #define IRQn_TMR1 (IRQn_Type)94
 #define IRQn_TMR2 (IRQn_Type)95
 
-#pragma pack(1)
-
+#pragma pack(2)
 typedef struct  //структура для удобства работы с временем в 1/256 секунд
 {
-    uint8_t low_part;
     uint32_t mid_part;
+    uint8_t low_part;
     uint8_t high_part;
     uint16_t zero_part;
 }typeCMTime;

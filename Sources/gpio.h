@@ -3,7 +3,7 @@
 
 #include "1986ve8_lib/cm4ikmcu.h"
 
-
+#pragma pack(2)
 /** 
   * @brief  структура управления одним GPIO
   */
