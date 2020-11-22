@@ -437,6 +437,16 @@
               <FileType>1</FileType>
               <FilePath>.\Sources\oai_dd.c</FilePath>
             </File>
+            <File>
+              <FileName>mpi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\mpi.c</FilePath>
+            </File>
+            <File>
+              <FileName>bdd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\bdd.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -891,6 +901,16 @@
               <FileType>1</FileType>
               <FilePath>.\Sources\oai_dd.c</FilePath>
             </File>
+            <File>
+              <FileName>mpi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\mpi.c</FilePath>
+            </File>
+            <File>
+              <FileName>bdd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\bdd.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1344,6 +1364,16 @@
               <FileName>oai_dd.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Sources\oai_dd.c</FilePath>
+            </File>
+            <File>
+              <FileName>mpi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\mpi.c</FilePath>
+            </File>
+            <File>
+              <FileName>bdd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\bdd.c</FilePath>
             </File>
           </Files>
         </Group>

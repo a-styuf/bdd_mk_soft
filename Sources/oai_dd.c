@@ -26,8 +26,10 @@ int8_t oai_dd_init(type_OAI_DD_model* oai_dd_ptr, uint8_t num, type_TRES_model* 
 {
   oai_dd_reset_val(oai_dd_ptr, num, t_res_ptr, adc_ch_v_ptr, adc_ch_i_ptr, dac_ch_ptr, v_a, v_b, curr_a, curr_b);
   //
-  pid_init(&oai_dd_ptr->pid_res, PID_RES_K, PID_RES_P, PID_RES_D, PID_RES_I, PID_RES_REACTION_MAX_V);
+  pid_init(&oai_dd_ptr->pid_res, PID_R_K, PID_R_P, PID_R_D, PID_R_I, PID_R_REACTION_MAX_V);
+  pid_init(&oai_dd_ptr->pid_current, PID_I_K, PID_I_P, PID_I_D, PID_I_I, PID_I_REACTION_MAX_V);
   pid_set_desired_value(&oai_dd_ptr->pid_res, DESIRED_RESISTANCE);
+  pid_set_desired_value(&oai_dd_ptr->pid_current, DESIRED_CURRENT);
   return 1;
 }
 
@@ -52,6 +54,7 @@ void oai_dd_reset_val(type_OAI_DD_model* oai_dd_ptr, uint8_t num, type_TRES_mode
   oai_dd_ptr->pressure = 0.;
   oai_dd_ptr->pressure_u16 = 0;
   oai_dd_ptr->temp = 0.;
+  oai_dd_ptr->mode = MODE_PID_R;
   //
   oai_dd_ptr->t_res_ptr = t_res_ptr;
   oai_dd_ptr->adc_v = adc_ch_v_ptr;
@@ -62,6 +65,17 @@ void oai_dd_reset_val(type_OAI_DD_model* oai_dd_ptr, uint8_t num, type_TRES_mode
   oai_dd_ptr->v_b = v_b;
   oai_dd_ptr->curr_a = curr_a;
   oai_dd_ptr->curr_b = curr_b;
+}
+
+/**
+  * @brief  установка режима работы ОАИ_ДД
+  * @param  oai_dd_ptr указатель на програмную модель устройства
+| * @param  mode режим работы
+  * @retval результат инициализации
+  */
+void oai_dd_set_mode(type_OAI_DD_model* oai_dd_ptr, uint8_t mode)
+{
+  oai_dd_ptr->mode = mode;
 }
 
 /**
@@ -81,10 +95,17 @@ void oai_dd_process(type_OAI_DD_model* oai_dd_ptr, uint16_t period_ms)
   else oai_dd_ptr->pr_res = oai_dd_ptr->pr_voltage/oai_dd_ptr->pr_current;
   oai_dd_ptr->temp = tres_get_temp(oai_dd_ptr->t_res_ptr);
   //обработка воздействия на выход ЦАП
-  oai_dd_pid_resistance(oai_dd_ptr, oai_dd_ptr->pr_res);
+  if (oai_dd_ptr->mode == MODE_PID_R){
+    oai_dd_pid_resistance(oai_dd_ptr, period_ms);
+  }
+  else if (oai_dd_ptr->mode == MODE_PID_I){
+    oai_dd_pid_current(oai_dd_ptr, period_ms);
+  }
+  else if (oai_dd_ptr->mode == MODE_PID_OFF){
+    //
+  }
   //установка полученных значений в ЦАП
   dac_set_ch_voltage(oai_dd_ptr->dac, oai_dd_ptr->dac_voltage);
-
 }
 
 /**
@@ -96,6 +117,27 @@ void oai_dd_pid_resistance(type_OAI_DD_model* oai_dd_ptr, uint16_t period_ms)
 {
   float dac_step = 0, dac_voltage_new = 0;
   dac_step = pid_step_calc(&oai_dd_ptr->pid_res, oai_dd_ptr->pr_res, period_ms);
+  dac_voltage_new = oai_dd_ptr->dac_voltage + dac_step;
+  if (dac_voltage_new >= DD_DAC_MAX_VOLTAGE){
+    oai_dd_ptr->dac_voltage = DD_DAC_MAX_VOLTAGE;
+  }
+  else if(dac_voltage_new <= DD_DAC_MIN_VOLTAGE){
+    oai_dd_ptr->dac_voltage = DD_DAC_MIN_VOLTAGE;
+  }
+  else{
+    oai_dd_ptr->dac_voltage = dac_voltage_new;
+  }
+}
+
+/**
+  * @brief  подсчет увелчения воздействия в случае стабилизации по току
+  * @param  oai_dd_ptr указатель на програмную модель устройства
+  * @param  period_ms период вызова данной функции
+  */
+void oai_dd_pid_current(type_OAI_DD_model* oai_dd_ptr, uint16_t period_ms)
+{
+  float dac_step = 0, dac_voltage_new = 0;
+  dac_step = pid_step_calc(&oai_dd_ptr->pid_current, oai_dd_ptr->pr_current, period_ms);
   dac_voltage_new = oai_dd_ptr->dac_voltage + dac_step;
   if (dac_voltage_new >= DD_DAC_MAX_VOLTAGE){
     oai_dd_ptr->dac_voltage = DD_DAC_MAX_VOLTAGE;
@@ -211,13 +253,15 @@ float pid_step_calc(type_PID_model* pid_ptr, float value, uint16_t period_ms)
   pid_ptr->derivate = (pid_ptr->value - pid_ptr->value_prev)/(period_ms/1000.);
   pid_ptr->error = pid_ptr->value_desired - pid_ptr->value;
   pid_ptr->integral += pid_ptr->error*(period_ms/1000.);
-  pid_ptr->P_reaction = pid_ptr->K_coeff*(pid_ptr->P_coeff*pid_ptr->value);
+  pid_ptr->P_reaction = pid_ptr->K_coeff*(pid_ptr->P_coeff*pid_ptr->error);
   pid_ptr->D_reaction = pid_ptr->K_coeff*(pid_ptr->D_coeff*pid_ptr->derivate);
   pid_ptr->I_reaction = pid_ptr->K_coeff*(pid_ptr->I_coeff*pid_ptr->integral);
   pid_ptr->reaction = pid_ptr->P_reaction + pid_ptr->D_reaction + pid_ptr->I_reaction;
   //
   if (pid_ptr->reaction > pid_ptr->reaction_max) pid_ptr->reaction = pid_ptr->reaction_max;
   else if (pid_ptr->reaction < -(pid_ptr->reaction_max)) pid_ptr->reaction = -pid_ptr->reaction_max;
+  //
+  pid_ptr->value_prev = pid_ptr->value;
   //
   return pid_ptr->reaction;
 }
@@ -231,7 +275,7 @@ float pid_step_calc(type_PID_model* pid_ptr, float value, uint16_t period_ms)
 uint8_t pid_get_str_report(type_PID_model* pid_ptr, char* report)
 {
   char report_str[128] = {0};
-  sprintf(report_str, "PID: P=%.3f D=%.3f I=%.3f React=%.1f", 
+  sprintf(report_str, "PID: P=%.3f D=%.3f I=%.3f React=%.3f", 
                       pid_ptr->P_reaction,
                       pid_ptr->D_reaction,
                       pid_ptr->I_reaction,
