@@ -178,7 +178,7 @@ void mpi_block_transmitter(void)
   */
 void INT_MIL0_Handler(void) 
 {
-e	mpi.cw = MIL_STD_15531->CommandWord1;
+	mpi.cw = MIL_STD_15531->CommandWord1;
 	mpi.msg = MIL_STD_15531->MSG;
 	mpi.leng = mpi.cw & 0x1F;
 	mpi.rcv_a = ((MIL_STD_15531->STATUS >> 9) & 0x01);

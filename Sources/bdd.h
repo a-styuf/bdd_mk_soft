@@ -12,52 +12,43 @@
 #include "oai_dd.h"
 #include "uarts.h"
 #include "debug.h"
+#include "bdd_mpi_interface.h"
 
+//defines
+#define BDD_MK_FRAME_MODIFICATOR 1
+#define BDD_MK_FRAME_DEVICE_NUMBER 1
+#define BDD_MK_FRAME_FABRICATION_NUM 12 
+
+#define BDD_MK_FRAME_TYPE_SYSTEM 0x01
+#define BDD_MK_FRAME_TYPE_OAI_DD 0x02
+
+#define BDD_MK_FRAME_SADDR_SYSTEM 0x0F
+#define BDD_MK_FRAME_SADDR_OAI_DD 0x01
+
+// дефайны для управления командами
+#define BDD_MK_FRAME_SADDR_COMMAND 30
+
+#define BDD_MK_COMMAND_LINK_CHECK   0
+#define BDD_MK_COMMAND_SET_OAI_DD_1_PID_MODE  1
+#define BDD_MK_COMMAND_SET_OAI_DD_2_PID_MODE  2
+#define BDD_MK_COMMAND_SET_OAI_DD_1_PID_DESIRED_VAL  3
+#define BDD_MK_COMMAND_SET_OAI_DD_2_PID_DESIRED_VAL  4
+
+// data structures
 #pragma pack(2)
-//----МПИ кадры
-typedef struct // ситстемный кадр
-{
-  uint16_t label;  //+0
-  uint16_t definer; //+2 
-  uint16_t num; //+4
-  uint32_t time; //+6
-  // основные параметры
-  uint16_t press_general; //+10
-  uint16_t temp; //+12
-  uint16_t current_24v; //+14
-  // полные измерения
-  uint16_t pressure[3]; //+16
-  uint16_t temp[3]; //+22
-  uint8_t mode; //+28
-  uint8_t state; //+29
-  uint8_t error; //+30
-  uint8_t error_cnt; //+31
-  uint16_t filler[15]; //+32
-  // 
-  uint16_t crc16; //+62 30
-}typeSysFrames;
-
-typedef struct // ситстемный кадр
-{
-  uint16_t label;  //+0
-  uint16_t definer; //+2 
-  uint16_t num; //+4
-  uint32_t time; //+6
-  // основные параметры
-  uint16_t filler[26]; //+10
-  // 
-  uint16_t crc16; //+62 30
-}typeOAIDDFrames;
-
-//----
 typedef struct  // программная модель управления БДД
 {
 	uint8_t mode;
   uint8_t state;
   uint8_t error, error_cnt;
   uint32_t time_slot_cnter;
-}type_BDD_control;
+}type_BDD_Control;
 
+typedef struct  // программная модель управления БДД
+{
+	typeSysFrames system;
+	typeOAIDDFrames oai_dd;
+}type_BDD_Frames;
 
 typedef struct  // программная модель управления БДД
 {
@@ -68,10 +59,16 @@ typedef struct  // программная модель управления БД
   type_MPI_model* mpi_ptr;
   type_SINGLE_GPIO rele_gpio, ku_gpio[2];
   //
-  type_BDD_control control;
+  type_BDD_Frames frame;
+  //
+  type_BDD_Control control;
 }type_BDD_model;
 
-int8_t bdd_init(type_BDD_model* bdd_ptr);
+// function prototypes
+
+int8_t bdd_init(type_BDD_model* bdd_ptr, type_MPI_model* mpi_ptr);
 void bdd_process(type_BDD_model* bdd_ptr, uint8_t period_ms);
+void bdd_oai_dd_frame_form(type_BDD_model* bdd_ptr);
+void bdd_system_frame_form(type_BDD_model* bdd_ptr);
 
 #endif

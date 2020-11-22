@@ -14,12 +14,13 @@
   * @param  bdd_ptr указатель на програмную модель устройства
   * @retval  0
   */
-int8_t bdd_init(type_BDD_model* bdd_ptr)
+int8_t bdd_init(type_BDD_model* bdd_ptr, type_MPI_model* mpi_ptr)
 {
   //инициализация устройств МК
   adc_init(&bdd_ptr->adc_0);
   dac_init(&bdd_ptr->dac);
   //
+  bdd_ptr->mpi_ptr = mpi_ptr;
   // gpio tmp
 	bdd_ptr->rele_gpio.num = 20;
 	bdd_ptr->rele_gpio.port = PORTE;
@@ -77,9 +78,54 @@ void bdd_process(type_BDD_model* bdd_ptr, uint8_t period_ms)
     printf("%s | ", report_str);
     oai_dd_get_str_report(&bdd_ptr->oai_dd_2, report_str);
     printf("%s\n", report_str);
+    //формирование кадров для отображения в МКО и выкладывание их на подпадреса
+    bdd_system_frame_form(bdd_ptr);
+    mpi_wr_to_subaddr(BDD_MK_FRAME_SADDR_SYSTEM, (uint16_t*)&bdd_ptr->frame.system);
+    bdd_oai_dd_frame_form(bdd_ptr);
+    mpi_wr_to_subaddr(BDD_MK_FRAME_SADDR_OAI_DD, (uint16_t*)&bdd_ptr->frame.oai_dd);
   }
   if ((bdd_ptr->control.time_slot_cnter % 100) == 0){  // тайм-слот - period_ms * 100
     //
   }
 }
 
+/**
+  * @brief  формирование кадра с параметрами работы OAI_DD
+  * @param  bdd_ptr указатель на програмную модель устройства
+  */
+void bdd_oai_dd_frame_form(type_BDD_model* bdd_ptr)
+{
+  bdd_ptr->frame.oai_dd.label = 0x0FF1;
+  bdd_ptr->frame.oai_dd.definer = mpi_int_frame_definer(
+                                                        BDD_MK_FRAME_MODIFICATOR, 
+                                                        BDD_MK_FRAME_DEVICE_NUMBER, 
+                                                        BDD_MK_FRAME_FABRICATION_NUM,
+                                                        BDD_MK_FRAME_TYPE_OAI_DD);
+  bdd_ptr->frame.oai_dd.num = 0x00;
+  bdd_ptr->frame.oai_dd.time = Get_Time_s();
+  //
+  memcpy((uint8_t*)bdd_ptr->frame.oai_dd.oai_dd_1_report, (uint8_t*)&bdd_ptr->oai_dd_1.report, 16);
+  memcpy((uint8_t*)bdd_ptr->frame.oai_dd.oai_dd_2_report, (uint8_t*)&bdd_ptr->oai_dd_2.report, 16);
+  //memcpy((uint8_t*)bdd_ptr->frame.oai_dd.oai_dd_1_report, (uint8_t*)bdd_ptr->oai_dd_1.report, 16);
+  //
+  bdd_ptr->frame.oai_dd.crc16 = mpi_int_crc16((uint8_t*)&bdd_ptr->frame.oai_dd, 62);
+}
+
+/**
+  * @brief  формирование кадра с общими параметрами
+  * @param  bdd_ptr указатель на програмную модель устройства
+  */
+void bdd_system_frame_form(type_BDD_model* bdd_ptr)
+{
+  bdd_ptr->frame.system.label = 0x0FF1;
+  bdd_ptr->frame.system.definer = mpi_int_frame_definer(
+                                                        BDD_MK_FRAME_MODIFICATOR, 
+                                                        BDD_MK_FRAME_DEVICE_NUMBER, 
+                                                        BDD_MK_FRAME_FABRICATION_NUM,
+                                                        BDD_MK_FRAME_TYPE_SYSTEM);
+  bdd_ptr->frame.system.num = 0x00;
+  bdd_ptr->frame.system.time = Get_Time_s();
+  //
+  //
+  bdd_ptr->frame.system.crc16 = mpi_int_crc16((uint8_t*)&bdd_ptr->frame.system, 62);
+}

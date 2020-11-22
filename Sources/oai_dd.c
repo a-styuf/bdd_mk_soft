@@ -102,14 +102,16 @@ void oai_dd_process(type_OAI_DD_model* oai_dd_ptr, uint16_t period_ms)
     oai_dd_pid_current(oai_dd_ptr, period_ms);
   }
   else if (oai_dd_ptr->mode == MODE_PID_OFF){
-    //
+    oai_dd_ptr->dac_voltage = DD_DAC_MIN_VOLTAGE;
   }
   //установка полученных значений в ЦАП
   dac_set_ch_voltage(oai_dd_ptr->dac, oai_dd_ptr->dac_voltage);
+  //создать отчет
+  oai_dd_get_frame_report(oai_dd_ptr);
 }
 
 /**
-  * @brief  подсчет увелчения воздействия в случае стабилизации по сопротивлению (оно же по температуре)
+  * @brief  подсчет увеличения воздействия в случае стабилизации по сопротивлению (оно же по температуре)
   * @param  oai_dd_ptr указатель на програмную модель устройства
   * @param  period_ms период вызова данной функции
   */
@@ -172,6 +174,19 @@ uint8_t oai_dd_get_str_report(type_OAI_DD_model* oai_dd_ptr, char* report)
   return strlen(report_str);
 }
 
+void oai_dd_get_frame_report(type_OAI_DD_model* oai_dd_ptr)
+{
+  oai_dd_ptr->report.mode = oai_dd_ptr->mode;
+  oai_dd_ptr->report.state = oai_dd_ptr->state;
+  oai_dd_ptr->report.pressure = oai_dd_ptr->pressure_u16;
+  oai_dd_ptr->report.temp = tres_get_temp_u16(oai_dd_ptr->t_res_ptr);
+  oai_dd_ptr->report.dac_out = (int16_t)floor(oai_dd_ptr->dac_voltage*256);
+  oai_dd_ptr->report.volt_in = (int16_t)floor(oai_dd_ptr->pr_voltage*256);
+  oai_dd_ptr->report.curr_in = (int16_t)floor(oai_dd_ptr->pr_current*256*1000);
+  oai_dd_ptr->report.resistance = (int16_t)floor(oai_dd_ptr->pr_res*256);
+  oai_dd_ptr->report.gap = 0xFEFE;
+}
+
 /// PID ///
 
 /**
@@ -217,12 +232,26 @@ void pid_reset(type_PID_model* pid_ptr)
 }
 
 /**
+  * @brief  сброс ппамяти ПИД
+  * @param  pid_ptr указатель на програмную модель устройства
+  */
+void pid_refreshet(type_PID_model* pid_ptr)
+{
+  pid_ptr->integral = 0.0;
+  pid_ptr->P_reaction = 0.0;
+  pid_ptr->D_reaction = 0.0;
+  pid_ptr->I_reaction = 0.0;
+  pid_ptr->reaction = 0.0;
+}
+
+/**
   * @brief  установка желаемого значения
   * @param  pid_ptr указатель на програмную модель устройства
   * @param  desired_value значение регулируемой величины, к которой происходит подстройка
   */
 void pid_set_desired_value(type_PID_model* pid_ptr, float desired_value)
 {
+  pid_refreshet(pid_ptr);
   pid_ptr->value_desired = desired_value;
 }
 

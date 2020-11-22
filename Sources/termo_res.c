@@ -61,7 +61,11 @@ float tres_get_temp(type_TRES_model* t_res_ptr)
 	* @param  t_res_ptr указатель на програмную модель устройства
 	* @retval значение температуры в int16_t в (1/256)°С
   */
-uint16_t tres_get_temp_u16(type_TRES_model* t_res_ptr);
+uint16_t tres_get_temp_u16(type_TRES_model* t_res_ptr)
+{
+  t_res_ptr->temp_u16 = (uint16_t)(tres_get_temp(t_res_ptr)*256.);
+  return t_res_ptr->temp_u16;
+}
 
 /**
   * @brief  функция линейной интерполяции

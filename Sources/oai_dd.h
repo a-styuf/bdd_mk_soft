@@ -41,7 +41,7 @@
 #define DESIRED_CURRENT 0.02
 //
 #define DD_DAC_MAX_VOLTAGE (3.3)
-#define DD_DAC_MIN_VOLTAGE (0.6)
+#define DD_DAC_MIN_VOLTAGE (0.8)
 
 #pragma pack(2)
 /** 
@@ -57,6 +57,22 @@ typedef struct
   float reaction_max;
   float reaction;
 } type_PID_model;
+
+/** 
+  * @brief  frame report 16-byte
+  */
+typedef struct
+{
+  uint8_t state; //+1
+  uint8_t mode; //+0
+  int16_t pressure; //+2
+  int16_t temp; //+4
+  int16_t dac_out; //+6 V
+  int16_t volt_in; //+8 V
+  int16_t curr_in; //+10 mA
+  uint16_t resistance; //+12 Ohm
+  uint16_t gap; //+14
+} type_OAI_Frame_Report;
 
 /** 
   * @brief  структура управления каналом oai_dd
@@ -77,6 +93,9 @@ typedef struct
   uint16_t pressure_u16;
   float temp;
   uint8_t mode;
+  uint8_t state;
+  //
+  type_OAI_Frame_Report report;
 } type_OAI_DD_model;
 
 //
@@ -92,9 +111,11 @@ float oai_dd_get_temp(type_OAI_DD_model* oai_dd_ptr);
 float oai_dd_get_pressure(type_OAI_DD_model* oai_dd_ptr);
 float oai_dd_get_resistance(type_OAI_DD_model* oai_dd_ptr);
 uint8_t oai_dd_get_str_report(type_OAI_DD_model* oai_dd_ptr, char* report);
+void oai_dd_get_frame_report(type_OAI_DD_model* oai_dd_ptr);
 //
 void pid_init(type_PID_model* pid_ptr, float K, float P, float D, float I, float reaction_max);
 void pid_reset(type_PID_model* pid_ptr);
+void pid_refreshet(type_PID_model* pid_ptr);
 void pid_set_desired_value(type_PID_model* pid_ptr, float desired_value);
 void pid_set_coeff(type_PID_model* pid_ptr, float K, float P, float D, float I);
 float pid_step_calc(type_PID_model* pid_ptr, float value, uint16_t period_ms);

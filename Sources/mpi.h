@@ -6,8 +6,6 @@
 #define IRQn_MIL_STD_15531 (IRQn_Type)117
 #define MPI_ADDRES_DEFAULT 13
 
-#define MPI_COMMAND_SUBADDR 30
-
 #pragma pack(2)
 typedef struct  //  max 62 - параетры ЦМ для сохоранения
 {
