@@ -452,6 +452,11 @@
               <FileType>1</FileType>
               <FilePath>.\Sources\bdd_mpi_interface.c</FilePath>
             </File>
+            <File>
+              <FileName>mvip.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\mvip.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -921,6 +926,11 @@
               <FileType>1</FileType>
               <FilePath>.\Sources\bdd_mpi_interface.c</FilePath>
             </File>
+            <File>
+              <FileName>mvip.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\mvip.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1389,6 +1399,11 @@
               <FileName>bdd_mpi_interface.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Sources\bdd_mpi_interface.c</FilePath>
+            </File>
+            <File>
+              <FileName>mvip.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\mvip.c</FilePath>
             </File>
           </Files>
         </Group>

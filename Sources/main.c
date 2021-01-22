@@ -4,14 +4,17 @@
 #include "sysinit.h"
 #include "wdt.h"
 #include "bdd.h"
+#include "mvip.h"
 
 //
 extern type_MPI_model mpi;
 type_BDD_model bdd;
+type_MVIP mvip;
 
 //
 char report_str[128] = {0};
 uint8_t n, m=0;
+uint16_t uint16_var;
 float var_float = 0;
 //
 int main() {
@@ -26,6 +29,8 @@ int main() {
 	Timers_Start(0, 1000);
 	//
 	bdd_init(&bdd, &mpi);
+	mvip_init(&mvip, &bdd.adc_0.ch[9], &bdd.adc_0.ch[8]);
+	mvip_set_mode(&mvip, MVIP_MODE_ON);
 	printf("BDD_MK is online\n");
 	//
 	while(1) {
@@ -36,7 +41,14 @@ int main() {
 			Timers_Start(0, 100); // перезапускаем таймер для формирования слота времени (возможная проблема - пропуск слота)
 			//
 			bdd_process(&bdd, 100);
+			mvip_process(&mvip, 100);
 			//
+			m++;
+			if (m >= 10){
+				m = 0;
+				mvip_get_str_report(&mvip, report_str);
+				printf("%s", report_str);
+			}
 		}
 		// обработка приема данных ОУ МПИ
 		if (mpi_process() != 0){

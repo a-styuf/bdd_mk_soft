@@ -90,7 +90,7 @@ void bdd_process(type_BDD_model* bdd_ptr, uint8_t period_ms)
 }
 
 /**
-  * @brief  формирование кадра с параметрами работы OAI_DD
+  * @brief  формирование кадра с параметрами работы датчиков давления
   * @param  bdd_ptr указатель на програмную модель устройства
   */
 void bdd_oai_dd_frame_form(type_BDD_model* bdd_ptr)
@@ -126,6 +126,21 @@ void bdd_system_frame_form(type_BDD_model* bdd_ptr)
   bdd_ptr->frame.system.num = 0x00;
   bdd_ptr->frame.system.time = Get_Time_s();
   //
+  bdd_ptr->frame.system.press_general = 0x00;
+  bdd_ptr->frame.system.temp_general = 0x00;
+  bdd_ptr->frame.system.current_24v = 0x00;
+  //
+  bdd_ptr->frame.system.pressure[0] = bdd_ptr->oai_dd_1.pressure_u16;
+  bdd_ptr->frame.system.pressure[1] = bdd_ptr->oai_dd_2.pressure_u16;
+  bdd_ptr->frame.system.pressure[2] = 0x00;
+  bdd_ptr->frame.system.temp[0] = bdd_ptr->oai_dd_1.t_res_ptr->temp_u16;
+  bdd_ptr->frame.system.temp[1] = bdd_ptr->oai_dd_2.t_res_ptr->temp_u16;
+  bdd_ptr->frame.system.temp[2] = 0x00;
+  //
+  bdd_ptr->frame.system.mode = bdd_ptr->control.mode;
+  bdd_ptr->frame.system.state = bdd_ptr->control.state;
+  bdd_ptr->frame.system.error = bdd_ptr->control.error;
+  bdd_ptr->frame.system.error_cnt = bdd_ptr->control.error_cnt;
   //
   bdd_ptr->frame.system.crc16 = mpi_int_crc16((uint8_t*)&bdd_ptr->frame.system, 62);
 }
