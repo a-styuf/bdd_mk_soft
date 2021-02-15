@@ -104,9 +104,8 @@ void bdd_oai_dd_frame_form(type_BDD_model* bdd_ptr)
   bdd_ptr->frame.oai_dd.num = 0x00;
   bdd_ptr->frame.oai_dd.time = Get_Time_s();
   //
-  memcpy((uint8_t*)bdd_ptr->frame.oai_dd.oai_dd_1_report, (uint8_t*)&bdd_ptr->oai_dd_1.report, 16);
-  memcpy((uint8_t*)bdd_ptr->frame.oai_dd.oai_dd_2_report, (uint8_t*)&bdd_ptr->oai_dd_2.report, 16);
-  //memcpy((uint8_t*)bdd_ptr->frame.oai_dd.oai_dd_1_report, (uint8_t*)bdd_ptr->oai_dd_1.report, 16);
+  memcpy((uint8_t*)bdd_ptr->frame.oai_dd.oai_dd_1_report, (uint8_t*)&bdd_ptr->oai_dd_1.report, sizeof(type_OAI_Frame_Report));
+  memcpy((uint8_t*)bdd_ptr->frame.oai_dd.oai_dd_2_report, (uint8_t*)&bdd_ptr->oai_dd_2.report, sizeof(type_OAI_Frame_Report));
   //
   bdd_ptr->frame.oai_dd.crc16 = mpi_int_crc16((uint8_t*)&bdd_ptr->frame.oai_dd, 62);
 }

@@ -457,6 +457,11 @@
               <FileType>1</FileType>
               <FilePath>.\Sources\mvip.c</FilePath>
             </File>
+            <File>
+              <FileName>digital_filter.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\digital_filter.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -931,6 +936,11 @@
               <FileType>1</FileType>
               <FilePath>.\Sources\mvip.c</FilePath>
             </File>
+            <File>
+              <FileName>digital_filter.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\digital_filter.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1404,6 +1414,11 @@
               <FileName>mvip.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Sources\mvip.c</FilePath>
+            </File>
+            <File>
+              <FileName>digital_filter.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\digital_filter.c</FilePath>
             </File>
           </Files>
         </Group>

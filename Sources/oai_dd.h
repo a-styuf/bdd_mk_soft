@@ -5,11 +5,13 @@
 #include "termo_res.h"
 #include "adc.h"
 #include "dac.h"
+#include "digital_filter.h"
 
 //
 #define MODE_PID_OFF 0x00
 #define MODE_PID_R 0x01
 #define MODE_PID_I 0x02
+#define MODE_PID_AUTO 0x03
 // Подсчет тока на лампочке (диффиренциальное включение ОУ: U_out = dUin*(R1/R2))
 #define I_R_SHUNT 10.0  // измерительное сопротивление для ткоа
 #define I_R1_FB_AMPL 20.0E4  // сопротивление обратной связи
@@ -32,8 +34,8 @@
 //
 #define DESIRED_RESISTANCE 75
 // PID Current-stabilisation
-#define PID_I_K 1.0
-#define PID_I_P 5.0
+#define PID_I_K 10.0
+#define PID_I_P 0.5
 #define PID_I_D 0.000
 #define PID_I_I 0.005
 #define PID_I_REACTION_MAX_V 0.2
@@ -42,6 +44,11 @@
 //
 #define DD_DAC_MAX_VOLTAGE (3.3)
 #define DD_DAC_MIN_VOLTAGE (0.8)
+// oai_dd_status fields
+#define OAI_DD_PID_OK 1<<0
+// oai_dd_mean_settings
+#define OAI_DD_TIME_S 4.0
+
 
 #pragma pack(2)
 /** 
@@ -59,20 +66,24 @@ typedef struct
 } type_PID_model;
 
 /** 
-  * @brief  frame report 16-byte
+  * @brief  frame report 26-byte
   */
 typedef struct
 {
-  uint8_t state; //+1
-  uint8_t mode; //+0
-  int16_t pressure; //+2
-  int16_t temp; //+4
-  int16_t dac_out; //+6 V
-  int16_t volt_in; //+8 V
-  int16_t curr_in; //+10 mA
-  uint16_t resistance; //+12 Ohm
-  uint16_t gap; //+14
-} type_OAI_Frame_Report;
+  uint8_t state;            //+1
+  uint8_t mode;             //+0
+  int16_t pressure;         //+2
+  int16_t temp;             //+4 °C/256
+  int16_t dac_out;          //+6 V/256
+  int16_t volt_in;          //+8 V/256
+  int16_t curr_in;          //+10 mA/256
+  int16_t curr_in_mean;     //+12 mA/256
+  uint16_t time_const_curr; //+14 s/256
+  uint16_t resistance;      //+16 Ohm/256
+  uint16_t resistance_mean; //+18 Ohm/256
+  uint16_t time_const_res;  //+20 s/256
+  uint16_t reserve[2];      //+22
+} type_OAI_Frame_Report;    //26
 
 /** 
   * @brief  структура управления каналом oai_dd
@@ -95,6 +106,7 @@ typedef struct
   uint8_t mode;
   uint8_t state;
   //
+  type_DFilter_model filter_res, filter_curr;
   type_OAI_Frame_Report report;
 } type_OAI_DD_model;
 

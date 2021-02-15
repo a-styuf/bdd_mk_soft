@@ -35,10 +35,8 @@ typedef struct // подробный кадр с работой ОАИ ДД
   uint16_t num; //+4
   uint32_t time; //+6
   // основные параметры
-  uint16_t oai_dd_1_report[8]; //+10
-  uint16_t oai_dd_2_report[8]; //+26
-  uint16_t imd_report[8]; //+42
-  uint8_t reserve[4]; //58
+  uint16_t oai_dd_1_report[13]; //+10
+  uint16_t oai_dd_2_report[13]; //+36
   // 
   uint16_t crc16; //+62 30
 }typeOAIDDFrames;

@@ -58,15 +58,31 @@ int main() {
 					{
 					case BDD_MK_COMMAND_LINK_CHECK:
 						break;
-					case BDD_MK_COMMAND_SET_OAI_DD_1_PID_MODE:
+					case BDD_MK_COMMAND_SET_OAI_DD_1_MODE:
 						oai_dd_set_mode(&bdd.oai_dd_1, (uint8_t)mpi.data[6]&0xFF);
-						if ((uint8_t)mpi.data[6]&0xFF != 0)	pid_set_desired_value(&bdd.oai_dd_1.pid_res, (uint8_t)mpi.data[7]&0xFF);
-						if ((uint8_t)mpi.data[7]&0xFF != 0)	pid_set_desired_value(&bdd.oai_dd_1.pid_current, (uint8_t)mpi.data[8]&0xFF);
 						break;
-					case BDD_MK_COMMAND_SET_OAI_DD_2_PID_MODE:
+					case BDD_MK_COMMAND_SET_OAI_DD_2_MODE:
 						oai_dd_set_mode(&bdd.oai_dd_2, (uint8_t)mpi.data[6]&0xFF);
-						if ((uint8_t)mpi.data[6]&0xFF != 0)	pid_set_desired_value(&bdd.oai_dd_2.pid_res, (uint8_t)mpi.data[7]&0xFF);
-						if ((uint8_t)mpi.data[7]&0xFF != 0)	pid_set_desired_value(&bdd.oai_dd_2.pid_current, (uint8_t)mpi.data[8]&0xFF);
+						break;
+					case BDD_MK_COMMAND_SET_OAI_DD_1_FILTER:
+						filter_parameter_set(&bdd.oai_dd_1.filter_res, mpi.data[6]/256., 0.1);
+						filter_parameter_set(&bdd.oai_dd_1.filter_curr, mpi.data[7]/256., 0.1);
+						break;
+					case BDD_MK_COMMAND_SET_OAI_DD_2_FILTER:
+						filter_parameter_set(&bdd.oai_dd_2.filter_res, mpi.data[6]/256., 0.1);
+						filter_parameter_set(&bdd.oai_dd_2.filter_curr, mpi.data[7]/256., 0.1);
+						break;
+					case BDD_MK_COMMAND_SET_OAI_DD_1_PID_SETTING:
+						pid_set_desired_value(&bdd.oai_dd_1.pid_res, mpi.data[6]/256.);
+						pid_set_desired_value(&bdd.oai_dd_1.pid_current, mpi.data[7]/256000.);
+						pid_set_coeff(&bdd.oai_dd_1.pid_res, PID_R_K, mpi.data[8]/256., mpi.data[9]/256., mpi.data[10]/256.);
+						pid_set_coeff(&bdd.oai_dd_1.pid_current, PID_R_K, mpi.data[11]/256., mpi.data[12]/256., mpi.data[13]/256.);
+						break;
+					case BDD_MK_COMMAND_SET_OAI_DD_2_PID_SETITNG:
+						pid_set_desired_value(&bdd.oai_dd_2.pid_res, mpi.data[6]/256.);
+						pid_set_desired_value(&bdd.oai_dd_2.pid_current, mpi.data[7]/256000.);
+						pid_set_coeff(&bdd.oai_dd_2.pid_res, PID_R_K, mpi.data[8]/256., mpi.data[9]/256., mpi.data[10]/256.);
+						pid_set_coeff(&bdd.oai_dd_2.pid_current, PID_R_K, mpi.data[11]/256., mpi.data[12]/256., mpi.data[13]/256.);
 						break;
 					default:
 						break;
