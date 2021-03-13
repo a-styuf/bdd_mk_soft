@@ -13,6 +13,8 @@
 #include "uarts.h"
 #include "debug.h"
 #include "bdd_mpi_interface.h"
+#include "mvip.h"
+#include "ims.h"
 
 //defines
 #define BDD_MK_FRAME_MODIFICATOR 1
@@ -56,10 +58,12 @@ typedef struct  // программная модель управления БД
 {
   type_ADC_model adc_0;
   type_DAC_model dac;
+  type_MVIP mvip;
   type_TRES_model tres_ims, tres_pirani_1, tres_pirani_2;
   type_OAI_DD_model oai_dd_1, oai_dd_2;
+  type_IMS_model ims;
   type_MPI_model* mpi_ptr;
-  type_SINGLE_GPIO rele_gpio, ku_gpio[2];
+  type_SINGLE_GPIO gpio[8], stm[10];
   //
   type_BDD_Frames frame;
   //

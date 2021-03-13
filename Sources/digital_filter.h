@@ -20,6 +20,7 @@ void filter_init(type_DFilter_model *filter_ptr);
 void filter_parameter_set(type_DFilter_model *filter_ptr, float time_const, float t_sample);
 void filter_process(type_DFilter_model *filter_ptr, float time_const, uint16_t period_ms);
 float filter_get_value(type_DFilter_model *filter_ptr);
+void filter_reset(type_DFilter_model *filter_ptr);
 
 #endif
 

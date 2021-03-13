@@ -16,22 +16,24 @@
   */
 int8_t bdd_init(type_BDD_model* bdd_ptr, type_MPI_model* mpi_ptr)
 {
+  uint8_t i = 0;
+  //GPIO
+  for (i=0; i<8; i++){
+    gpio_init(&bdd_ptr->gpio[i], PORTE, 16+i);
+    gpio_set(&bdd_ptr->gpio[i], 0);
+  }
+  //STM
+  for (i=0; i<10; i++){
+    gpio_init(&bdd_ptr->stm[i], PORTE, 6+i);
+    gpio_set(&bdd_ptr->stm[i], 0);
+  }
   //инициализация устройств МК
   adc_init(&bdd_ptr->adc_0);
   dac_init(&bdd_ptr->dac);
-  //
+  mvip_init(&bdd_ptr->mvip, &bdd_ptr->adc_0.ch[9], &bdd_ptr->adc_0.ch[8]);
+  ims_init(&bdd_ptr->ims, &bdd_ptr->tres_ims, &bdd_ptr->adc_0.ch[0], &bdd_ptr->mvip, &bdd_ptr->gpio[4], &bdd_ptr->gpio[2], &bdd_ptr->gpio[3]);
+  //mko
   bdd_ptr->mpi_ptr = mpi_ptr;
-  // gpio tmp
-	bdd_ptr->rele_gpio.num = 20;
-	bdd_ptr->rele_gpio.port = PORTE;
-	gpio_set(&bdd_ptr->rele_gpio, 0);
-	bdd_ptr->ku_gpio[0].num = 18;
-	bdd_ptr->ku_gpio[0].port = PORTE;
-	gpio_set(&bdd_ptr->ku_gpio[0], 0);
-	bdd_ptr->ku_gpio[1].num = 19;
-	bdd_ptr->ku_gpio[1].port = PORTE;
-	gpio_set(&bdd_ptr->ku_gpio[1], 0);
-	//
   //инициализация измерителей
   tres_init(&bdd_ptr->tres_ims, &bdd_ptr->adc_0.ch[1]);
   tres_init(&bdd_ptr->tres_pirani_1, &bdd_ptr->adc_0.ch[4]);
@@ -62,22 +64,18 @@ void bdd_ctrl_reset(type_BDD_model* bdd_ptr)
   */
 void bdd_process(type_BDD_model* bdd_ptr, uint8_t period_ms)
 {
-  char report_str[128] = {0};
-  //
   bdd_ptr->control.time_slot_cnter += 1;
   //
   if ((bdd_ptr->control.time_slot_cnter % 1) == 0) {  // тайм-слот - period_ms * 1
     //обработка процессов
     adc_process(&bdd_ptr->adc_0, period_ms);
-    oai_dd_process(&bdd_ptr->oai_dd_1, period_ms);
-    oai_dd_process(&bdd_ptr->oai_dd_2, period_ms);
+    ims_process(&bdd_ptr->ims, period_ms);
+    mvip_process(&bdd_ptr->mvip, period_ms);
   }
   if ((bdd_ptr->control.time_slot_cnter % 10) == 0){  // тайм-слот - period_ms * 10
-    // получение отчета о работе
-    oai_dd_get_str_report(&bdd_ptr->oai_dd_1, report_str);
-    printf("%s | ", report_str);
-    oai_dd_get_str_report(&bdd_ptr->oai_dd_2, report_str);
-    printf("%s\n", report_str);
+    //обработка oai_dd
+    oai_dd_process(&bdd_ptr->oai_dd_1, period_ms*10);
+    oai_dd_process(&bdd_ptr->oai_dd_2, period_ms*10);
     //формирование кадров для отображения в МКО и выкладывание их на подпадреса
     bdd_system_frame_form(bdd_ptr);
     mpi_wr_to_subaddr(BDD_MK_FRAME_SADDR_SYSTEM, (uint16_t*)&bdd_ptr->frame.system);

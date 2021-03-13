@@ -29,10 +29,15 @@ int8_t oai_dd_init(type_OAI_DD_model* oai_dd_ptr, uint8_t num, type_TRES_model* 
   pid_init(&oai_dd_ptr->pid_res, PID_R_K, PID_R_P, PID_R_D, PID_R_I, PID_R_REACTION_MAX_V);
   pid_init(&oai_dd_ptr->pid_current, PID_I_K, PID_I_P, PID_I_D, PID_I_I, PID_I_REACTION_MAX_V);
   pid_set_desired_value(&oai_dd_ptr->pid_res, DESIRED_RESISTANCE);
-  pid_set_desired_value(&oai_dd_ptr->pid_current, DESIRED_CURRENT);
+  pid_set_desired_value(&oai_dd_ptr->pid_current, DESIRED_CURRENT_MA);
   //
   filter_init(&oai_dd_ptr->filter_res);
   filter_init(&oai_dd_ptr->filter_curr);
+  filter_init(&oai_dd_ptr->filter_voltage);
+  //
+  filter_parameter_set(&oai_dd_ptr->filter_res, OAI_DD_TIME_S, 0.1);
+  filter_parameter_set(&oai_dd_ptr->filter_curr, OAI_DD_TIME_S, 0.1);
+  filter_parameter_set(&oai_dd_ptr->filter_voltage, OAI_DD_TIME_S, 0.1);
   return 1;
 }
 
@@ -96,7 +101,7 @@ void oai_dd_process(type_OAI_DD_model* oai_dd_ptr, uint16_t period_ms)
   adc_voltage = adc_get_ch_voltage(oai_dd_ptr->adc_i);
   oai_dd_ptr->pr_current = oai_dd_ptr->curr_a*adc_voltage + oai_dd_ptr->curr_b;
   if(oai_dd_ptr->pr_current == 0) oai_dd_ptr->pr_res = 0.0;
-  else oai_dd_ptr->pr_res = oai_dd_ptr->pr_voltage/oai_dd_ptr->pr_current;
+  else oai_dd_ptr->pr_res = oai_dd_ptr->pr_voltage*1000./oai_dd_ptr->pr_current;
   oai_dd_ptr->temp = tres_get_temp(oai_dd_ptr->t_res_ptr);
   //обработка воздействия на выход ЦАП
   if (oai_dd_ptr->mode == MODE_PID_R){
@@ -113,6 +118,7 @@ void oai_dd_process(type_OAI_DD_model* oai_dd_ptr, uint16_t period_ms)
   //фильтрация выдаваемых параметров
   filter_process(&oai_dd_ptr->filter_res, oai_dd_ptr->pr_res, period_ms);
   filter_process(&oai_dd_ptr->filter_curr, oai_dd_ptr->pr_current, period_ms);
+  filter_process(&oai_dd_ptr->filter_voltage, oai_dd_ptr->pr_voltage, period_ms);
   //создать отчет
   oai_dd_get_frame_report(oai_dd_ptr);
 }
@@ -189,13 +195,14 @@ void oai_dd_get_frame_report(type_OAI_DD_model* oai_dd_ptr)
   oai_dd_ptr->report.temp = tres_get_temp_u16(oai_dd_ptr->t_res_ptr);
   oai_dd_ptr->report.dac_out = (int16_t)floor(oai_dd_ptr->dac_voltage*256);
   oai_dd_ptr->report.volt_in = (int16_t)floor(oai_dd_ptr->pr_voltage*256);
-  oai_dd_ptr->report.curr_in = (int16_t)floor(oai_dd_ptr->pr_current*256*1000);
-  oai_dd_ptr->report.resistance_mean = (int16_t)floor((filter_get_value(&oai_dd_ptr->filter_res))*256);
-  oai_dd_ptr->report.time_const_curr = (int16_t)floor(oai_dd_ptr->filter_curr.time_const*256);
+  oai_dd_ptr->report.curr_in = (int16_t)floor(oai_dd_ptr->pr_current*256);
   oai_dd_ptr->report.resistance = (int16_t)floor(oai_dd_ptr->pr_res*256);
-  oai_dd_ptr->report.curr_in_mean = (int16_t)floor((filter_get_value(&oai_dd_ptr->filter_curr))*256*1000);
+  oai_dd_ptr->report.volt_in_mean = (int16_t)floor((filter_get_value(&oai_dd_ptr->filter_voltage))*256);
+  oai_dd_ptr->report.curr_in_mean = (int16_t)floor((filter_get_value(&oai_dd_ptr->filter_curr))*256);
+  oai_dd_ptr->report.resistance_mean = (int16_t)floor((filter_get_value(&oai_dd_ptr->filter_res))*256);
+  oai_dd_ptr->report.time_const_volt = (int16_t)floor(oai_dd_ptr->filter_voltage.time_const*256);
+  oai_dd_ptr->report.time_const_curr = (int16_t)floor(oai_dd_ptr->filter_curr.time_const*256);
   oai_dd_ptr->report.time_const_res = (int16_t)floor(oai_dd_ptr->filter_res.time_const*256);
-  memset((uint8_t*)oai_dd_ptr->report.reserve, 0xFE, 4);
 }
 
 /// PID ///

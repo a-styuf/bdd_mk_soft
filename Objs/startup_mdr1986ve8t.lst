@@ -989,7 +989,7 @@ ARM Macro Assembler    Page 16
               00000000 
 Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4 --apcs=interw
 ork --depend=.\objs\startup_mdr1986ve8t.d -o.\objs\startup_mdr1986ve8t.o -I.\RT
-E\_Target__ExtMEM_Dbg_ -IC:\Users\a-sty\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0
+E\_Target__ExtMEM_Rls_ -IC:\Users\a-sty\AppData\Local\Arm\Packs\ARM\CMSIS\5.7.0
 \CMSIS\Core\Include -IC:\Users\a-sty\AppData\Local\Arm\Packs\Keil\MDR1986VE8T\0
 .4.1\Libraries\CMSIS\CM4\DeviceSupport\MDR32F8\inc --predefine="__UVISION_VERSI
 ON SETA 532" --predefine="_RTE_ SETA 1" --predefine="USE_MDR32F8 SETA 1" --pred

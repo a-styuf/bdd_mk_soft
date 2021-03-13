@@ -14,8 +14,8 @@ LR_ROM1 0x10000000 0x00000400  {    ; load region size_region
   }
 }
 
-LR_ROM2 0x10000500 0x00008000  {
-  ER_ROM2 0x10000500 0x00008000  {  ; load address = execution address
+LR_ROM2 0x10000500 0x00007C00  {
+  ER_ROM2 0x10000500 0x00007C00  {  ; load address = execution address
    .ANY (+RO)
   }
 }

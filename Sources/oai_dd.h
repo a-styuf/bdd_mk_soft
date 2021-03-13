@@ -12,12 +12,12 @@
 #define MODE_PID_R 0x01
 #define MODE_PID_I 0x02
 #define MODE_PID_AUTO 0x03
-// Подсчет тока на лампочке (диффиренциальное включение ОУ: U_out = dUin*(R1/R2))
+// Подсчет тока на лампочке (диффиренциальное включение ОУ: U_out[mA] = dUin*(R1/R2))
 #define I_R_SHUNT 10.0  // измерительное сопротивление для ткоа
 #define I_R1_FB_AMPL 20.0E4  // сопротивление обратной связи
 #define I_R2_FB_AMPL 51.0E3  // сопротивление во вход ОУ
 #define I_K_FB_AMPL (I_R1_FB_AMPL/I_R2_FB_AMPL)  // кожффициент усиления обратной связи
-#define I_A (1.0/(I_K_FB_AMPL*I_R_SHUNT)) // кожффициент пересчетв напряжения АЦП в ток
+#define I_A (1000.0/(I_K_FB_AMPL*I_R_SHUNT)) // кожффициент пересчетв напряжения АЦП в ток
 #define I_B 0.0
 // Подсчет напряжения на лампочке (Включение с положительной обратной связью: Uout = Uin(1+R1/R2))
 #define V_R1_FB_AMPL 3.0E3  // сопротивление обратной связи
@@ -40,14 +40,14 @@
 #define PID_I_I 0.005
 #define PID_I_REACTION_MAX_V 0.2
 //
-#define DESIRED_CURRENT 0.02
+#define DESIRED_CURRENT_MA 20
 //
 #define DD_DAC_MAX_VOLTAGE (3.3)
 #define DD_DAC_MIN_VOLTAGE (0.8)
 // oai_dd_status fields
 #define OAI_DD_PID_OK 1<<0
 // oai_dd_mean_settings
-#define OAI_DD_TIME_S 4.0
+#define OAI_DD_TIME_S 2.0
 
 
 #pragma pack(2)
@@ -77,13 +77,14 @@ typedef struct
   int16_t dac_out;          //+6 V/256
   int16_t volt_in;          //+8 V/256
   int16_t curr_in;          //+10 mA/256
-  int16_t curr_in_mean;     //+12 mA/256
-  uint16_t time_const_curr; //+14 s/256
-  uint16_t resistance;      //+16 Ohm/256
+  uint16_t resistance;      //+12 Ohm/256
+  int16_t volt_in_mean;     //+14 V/256
+  int16_t curr_in_mean;     //+16 mA/256
   uint16_t resistance_mean; //+18 Ohm/256
-  uint16_t time_const_res;  //+20 s/256
-  uint16_t reserve[2];      //+22
-} type_OAI_Frame_Report;    //26
+  uint16_t time_const_volt; //+20 s/256
+  uint16_t time_const_curr; //+22 s/256
+  uint16_t time_const_res;  //+24 s/256
+  } type_OAI_Frame_Report;    //26
 
 /** 
   * @brief  структура управления каналом oai_dd
@@ -106,7 +107,7 @@ typedef struct
   uint8_t mode;
   uint8_t state;
   //
-  type_DFilter_model filter_res, filter_curr;
+  type_DFilter_model filter_res, filter_curr, filter_voltage;
   type_OAI_Frame_Report report;
 } type_OAI_DD_model;
 

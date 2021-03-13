@@ -16,7 +16,7 @@
 int8_t mvip_init(type_MVIP* mvip_ptr, type_ADC_channel* adc_v_fb, type_ADC_channel* adc_i24)
 {
   //
-  mvip_ptr->mode = 0;
+  mvip_ptr->mode = MVIP_MODE_OFF;
   mvip_ptr->state = 0;
   mvip_ptr->pwm_val = 0;
   mvip_ptr->pwm_val_float = 0;

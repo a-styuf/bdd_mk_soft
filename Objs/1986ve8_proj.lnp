@@ -15,6 +15,7 @@
 ".\objs\bdd_mpi_interface.o"
 ".\objs\mvip.o"
 ".\objs\digital_filter.o"
+".\objs\ims.o"
 ".\objs\core_cm4.o"
 ".\objs\startup_mdr1986ve8t.o"
 --strict --scatter ".\Objs\1986ve8_proj.sct"
