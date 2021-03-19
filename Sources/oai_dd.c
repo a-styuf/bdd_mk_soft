@@ -193,11 +193,11 @@ void oai_dd_get_frame_report(type_OAI_DD_model* oai_dd_ptr)
   oai_dd_ptr->report.state = oai_dd_ptr->state;
   oai_dd_ptr->report.pressure = oai_dd_ptr->pressure_u16;
   oai_dd_ptr->report.temp = tres_get_temp_u16(oai_dd_ptr->t_res_ptr);
-  oai_dd_ptr->report.dac_out = (int16_t)floor(oai_dd_ptr->dac_voltage*256);
-  oai_dd_ptr->report.volt_in = (int16_t)floor(oai_dd_ptr->pr_voltage*256);
+  oai_dd_ptr->report.dac_out = (int16_t)floor(oai_dd_ptr->dac_voltage*2560.);
+  oai_dd_ptr->report.volt_in = (int16_t)floor(oai_dd_ptr->pr_voltage*2560.);
   oai_dd_ptr->report.curr_in = (int16_t)floor(oai_dd_ptr->pr_current*256);
   oai_dd_ptr->report.resistance = (int16_t)floor(oai_dd_ptr->pr_res*256);
-  oai_dd_ptr->report.volt_in_mean = (int16_t)floor((filter_get_value(&oai_dd_ptr->filter_voltage))*256);
+  oai_dd_ptr->report.volt_in_mean = (int16_t)floor((filter_get_value(&oai_dd_ptr->filter_voltage))*2560.);
   oai_dd_ptr->report.curr_in_mean = (int16_t)floor((filter_get_value(&oai_dd_ptr->filter_curr))*256);
   oai_dd_ptr->report.resistance_mean = (int16_t)floor((filter_get_value(&oai_dd_ptr->filter_res))*256);
   oai_dd_ptr->report.time_const_volt = (int16_t)floor(oai_dd_ptr->filter_voltage.time_const*256);

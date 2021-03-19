@@ -74,11 +74,11 @@ typedef struct
   uint8_t mode;             //+0
   int16_t pressure;         //+2
   int16_t temp;             //+4 °C/256
-  int16_t dac_out;          //+6 V/256
-  int16_t volt_in;          //+8 V/256
+  int16_t dac_out;          //+6 V/2560
+  int16_t volt_in;          //+8 V/2560
   int16_t curr_in;          //+10 mA/256
   uint16_t resistance;      //+12 Ohm/256
-  int16_t volt_in_mean;     //+14 V/256
+  int16_t volt_in_mean;     //+14 V/2560
   int16_t curr_in_mean;     //+16 mA/256
   uint16_t resistance_mean; //+18 Ohm/256
   uint16_t time_const_volt; //+20 s/256

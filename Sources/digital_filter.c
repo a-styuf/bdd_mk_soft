@@ -15,7 +15,13 @@
   */
 void filter_init(type_DFilter_model *filter_ptr)
 {
+  uint8_t i=0;
+
 	filter_parameter_set(filter_ptr, DF_DEFAULT_TIME_CONST_S, 0.1);
+  for (i=0; i<8; i++){
+    filter_ptr->value_in_buff[i] = 0;
+    filter_ptr->value_out_buff[i] = 0;
+  }
 }
 
 /**
@@ -26,13 +32,8 @@ void filter_init(type_DFilter_model *filter_ptr)
   */
 void filter_parameter_set(type_DFilter_model *filter_ptr, float time_const, float t_sample)
 {
-  uint8_t i=0;
   filter_ptr->time_const = time_const;
   filter_ptr->t_sample = t_sample;
-  for (i=0; i<8; i++){
-    filter_ptr->value_in_buff[i] = 0;
-    filter_ptr->value_out_buff[i] = 0;
-  }
 }
 
 /**

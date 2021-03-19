@@ -90,10 +90,16 @@ int main() {
 void INT_ADC0_CallBack(void) {
   uint32_t rslt;
   uint16_t chn, val;
+	NVIC_DisableIRQ(IRQn_ADC0);
+	//
+	gpio_set(&bdd.stm[9], 1);
   while(bdd.adc_0.reg->STATUS & 1) {
     rslt = bdd.adc_0.reg->RESULT;
     chn = *((uint16_t*)&rslt + 1);
-    val = *((uint16_t*)&rslt);
-    bdd.adc_0.ch[chn].val = val;
+    val = *((uint16_t*)&rslt) << 4;
+		adc_new_val_process(&bdd.adc_0.ch[chn], val);
   }
+	gpio_set(&bdd.stm[9], 0);
+	//
+	NVIC_EnableIRQ(IRQn_ADC0);
 }

@@ -13,7 +13,7 @@ void adc_init(type_ADC_model* adc_ptr)
   //
   adc_ptr->reg = ADC0;
   adc_ptr->reg->KEY = _KEY_;
-  adc_ptr->reg->CONFIG1 = (255<<12)|(511<<3);  //��� ����� ���������
+  adc_ptr->reg->CONFIG1 = (31<<12)|(255<<3);  //19-12: pause in cycles, 11-3: charging time in cycles
   /* ���������� */
   adc_ptr->reg->FIFOEN1 = 0xF0000000;
   adc_ptr->reg->CONFIG0 = 1;  //enable adc
@@ -51,6 +51,7 @@ void adc_set_ch_a_b(type_ADC_model* adc_ptr, float *a, float *b)
     adc_ptr->ch[i].a = a[i];
     adc_ptr->ch[i].b = b[i];
     adc_ptr->ch[i].adc_ch_num = i;
+    adc_ptr->ch[i].val_buff_wr_ptr = 0;
   }
 }
 
@@ -67,7 +68,7 @@ float adc_ch_voltage(type_ADC_model* adc_ptr, uint8_t ch_num)
     return 0.0;
   }
   NVIC_DisableIRQ(IRQn_ADC0);
-  adc_ch_voltage = adc_ptr->ch[ch_num].a*adc_ptr->ch[ch_num].val + adc_ptr->ch[ch_num].b;
+  adc_ch_voltage = (adc_ptr->ch[ch_num].a)*adc_ptr->ch[ch_num].val_mean + adc_ptr->ch[ch_num].b;
   NVIC_EnableIRQ(IRQn_ADC0);
   return adc_ch_voltage;
 }
@@ -82,7 +83,7 @@ float calc_mcu_temp(type_ADC_model* adc_ptr)
 	float temp_fp;
 	int16_t temp_adc_val;
   NVIC_DisableIRQ(IRQn_ADC0);
-	temp_adc_val = (int16_t)adc_ptr->ch[ADC0_CHAN_TEMP].val; 
+	temp_adc_val = (int16_t)adc_ptr->ch[ADC0_CHAN_TEMP].val/4; 
   NVIC_EnableIRQ(IRQn_ADC0);
 	temp_fp = (-(temp_adc_val) + FACTORY_ADC_TEMP25)/FACTORY_ADC_AVG_SLOPE + FACTORY_TEMP25;
 	return temp_fp;
@@ -125,6 +126,32 @@ float get_mcu_temp(type_ADC_model* adc_ptr)
 	volatile float temp_fp;
 	temp_fp = adc_ptr->temp;
 	return temp_fp;
+}
+
+/**
+  * @brief  обработка нового значения канала АЦП
+  * @param  adc_ch_ptr указатель на програмную модель устройства 
+  * @param  new_val новое значение, полученное в канале АЦП
+  */
+void adc_new_val_process(type_ADC_channel* adc_ch_ptr, uint16_t new_val)
+{
+  uint8_t i=0;
+  volatile uint32_t adc_val_summ = 0;
+  //
+  adc_ch_ptr->val = new_val;
+  adc_ch_ptr->val_buff[adc_ch_ptr->val_buff_wr_ptr] = new_val;
+  //
+  for (i=0; i<ADC_CHAN_MEAN_SIZE; i++){
+    adc_val_summ += adc_ch_ptr->val_buff[i];
+  }
+  adc_ch_ptr->val_mean = (uint16_t)(adc_val_summ >> (ADC_CHAN_MEAN_SIZE_2_POW));
+  //
+  if (adc_ch_ptr->val_buff_wr_ptr >= (ADC_CHAN_MEAN_SIZE-1)){
+    adc_ch_ptr->val_buff_wr_ptr = 0;
+  }
+  else{
+    adc_ch_ptr->val_buff_wr_ptr += 1;
+  }
 }
 
 /**
