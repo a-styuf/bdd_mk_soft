@@ -32,6 +32,9 @@
 // ku_change_bound
 #define IMS_TOP_VOLTAGE    2.7
 #define IMS_BOT_VOLTAGE    0.5
+// Measurement timeout
+#define  IMS_MEASURE_DEAD_TIME_MS 200
+#define  IMS_CALIBRATION_TIME_MS 2000
 
 #pragma pack(2)
 /** 
@@ -57,10 +60,11 @@ typedef struct
   type_MVIP* mvip;
   type_SINGLE_GPIO *rele_gpio, *ku_gpio_0, *ku_gpio_1;
   type_DFilter_model filter_u, filter_temp;
-  uint8_t ku;
   float v_a[4], v_b[4];
-  float curr_a, curr_b;
-  float voltage;
+  float voltage[4], zero_voltage[4];
+  float curr_a[4], curr_b[4];
+  uint8_t ku;
+  uint16_t dead_time;
   float pressure;
   uint16_t pressure_u16;
   float temp;
@@ -78,7 +82,7 @@ void ims_process(type_IMS_model* ims_ptr, uint16_t period_ms);
 void ims_simple_process(type_IMS_model* ims_ptr, uint16_t period_ms);
 void ims_calibr_process(type_IMS_model* ims_ptr, uint16_t period_ms);
 int8_t ims_range_change_checking(type_IMS_model* ims_ptr, float voltage);
-void ims_range_change(type_IMS_model* ims_ptr);
+void ims_range_change(type_IMS_model* ims_ptr, uint16_t period_ms);
 float ims_get_voltage(type_IMS_model* ims_ptr);
 float ims_get_current(type_IMS_model* ims_ptr);
 float ims_get_temp(type_IMS_model* ims_ptr);

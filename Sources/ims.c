@@ -46,6 +46,7 @@ void ims_reset_val(type_IMS_model* ims_ptr)
 {
   ims_ptr->pressure = 0.;
   ims_ptr->ku = 0;
+  ims_ptr->dead_time = IMS_MEASURE_DEAD_TIME_MS;
   ims_ptr->pressure_u16 = 0;
   ims_ptr->temp = 0.;
   ims_ptr->mode = IMS_MODE_DEFAULT;
@@ -71,18 +72,19 @@ void ims_set_mode(type_IMS_model* ims_ptr, uint8_t mode)
   */
 void ims_process(type_IMS_model* ims_ptr, uint16_t period_ms)
 {
-  //обновление параметров канала из данных АЦП
-  ims_ptr->voltage = adc_get_ch_voltage(ims_ptr->adc_v);
-  filter_process(&ims_ptr->filter_u, ims_ptr->voltage, period_ms);
-  //
+  
+  //проверка температуры канала
   ims_ptr->temp = tres_get_temp(ims_ptr->t_res_ptr);
   filter_process(&ims_ptr->filter_temp, ims_ptr->temp, period_ms);
-  //обработка воздействия на выход ЦАП
+  //обновление параметров канала из данных АЦП
+  ims_ptr->voltage[ims_ptr->ku] = adc_get_ch_voltage(ims_ptr->adc_v);
+  filter_process(&ims_ptr->filter_u, ims_ptr->voltage[ims_ptr->ku], period_ms);
+  //проверка режима работы
   if (ims_ptr->mode == IMS_MODE_SIMPLE){
     ims_simple_process(ims_ptr, period_ms);
   }
   else if (ims_ptr->mode == IMS_MODE_OFF){
-    //
+    
   }
   //создать отчет
   ims_get_frame_report(ims_ptr);
@@ -95,7 +97,7 @@ void ims_process(type_IMS_model* ims_ptr, uint16_t period_ms)
   */
 void ims_simple_process(type_IMS_model* ims_ptr, uint16_t period_ms)
 {
-  ims_range_change(ims_ptr);
+  ims_range_change(ims_ptr, period_ms);
 }
 
 /**
@@ -123,23 +125,29 @@ int8_t ims_range_change_checking(type_IMS_model* ims_ptr, float voltage)
   * @param  ims_ptr указатель на програмную модель устройства
   * @param  period_ms период вызова данной функции
   */
-void ims_range_change(type_IMS_model* ims_ptr)
+void ims_range_change(type_IMS_model* ims_ptr, uint16_t period_ms)
 {
   int8_t need_to_change = 0;
   //
-  need_to_change = ims_range_change_checking(ims_ptr, ims_ptr->voltage);
-  //
-  if (need_to_change){
-    if (need_to_change == 1){
-      ims_ptr->ku = (ims_ptr->ku < 4) ? (ims_ptr->ku + 1) : ims_ptr->ku;
-    }
-    else if (need_to_change == -1){
-      ims_ptr->ku = (ims_ptr->ku > 0) ? (ims_ptr->ku - 1) : ims_ptr->ku;
-    }
-    filter_reset(&ims_ptr->filter_u);
+  if (ims_ptr->dead_time > 0){
+    ims_ptr->dead_time -= period_ms;
   }
   else{
+    need_to_change = ims_range_change_checking(ims_ptr, ims_ptr->voltage[ims_ptr->ku]);
     //
+    if (need_to_change){
+      if (need_to_change == 1){
+        ims_ptr->ku = (ims_ptr->ku < 4) ? (ims_ptr->ku + 1) : ims_ptr->ku;
+      }
+      else if (need_to_change == -1){
+        ims_ptr->ku = (ims_ptr->ku > 0) ? (ims_ptr->ku - 1) : ims_ptr->ku;
+      }
+      ims_ptr->dead_time = IMS_MEASURE_DEAD_TIME_MS;
+      filter_reset(&ims_ptr->filter_u);
+    }
+    else{
+      // NULL;
+    }
   }
 }
 
@@ -176,7 +184,7 @@ void ims_get_frame_report(type_IMS_model* ims_ptr)
   ims_ptr->report.state = ims_ptr->state;
   ims_ptr->report.pressure = ims_ptr->pressure_u16;
   ims_ptr->report.temp = (int16_t)floor(filter_get_value(&ims_ptr->filter_temp)*256);
-  ims_ptr->report.voltage = (int16_t)floor(ims_ptr->voltage*256);
+  ims_ptr->report.voltage = (int16_t)floor(ims_ptr->voltage[0]*256);
   memset((uint8_t*)ims_ptr->report.reserve, 0xFE, 18);
 }
 

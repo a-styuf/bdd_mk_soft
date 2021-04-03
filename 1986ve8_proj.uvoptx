@@ -608,6 +608,11 @@
           <WinNumber>2</WinNumber>
           <ItemText>\\1986ve8_proj\Sources/main.c\bdd.oai_dd_1.report</ItemText>
         </Ww>
+        <Ww>
+          <count>5</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>\\1986ve8_proj\Sources/main.c\bdd.ims</ItemText>
+        </Ww>
       </WatchWindow2>
       <MemoryWindow1>
         <Mm>

@@ -6,6 +6,7 @@
 #include "bdd.h"
 #include "mvip.h"
 
+#define SOFT_VERSION "0.1.1"
 //
 extern type_MPI_model mpi;
 type_BDD_model bdd;
@@ -27,7 +28,7 @@ int main() {
 	Timers_Start(0, 1000);
 	//
 	bdd_init(&bdd, &mpi);
-	printf("BDD is online\n");
+	printf("BDD MKO: v%s\n", SOFT_VERSION);
 	//
 	while(1) {
 		WDRST;
