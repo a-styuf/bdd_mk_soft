@@ -16,7 +16,7 @@ uint8_t n, m=0;
 uint16_t uint16_var;
 float var_float = 0;
 //
-int main() {
+ int main() {
 	// инициализация переферии
 	System_Init();
 	WDT_Init();
@@ -75,6 +75,12 @@ int main() {
 						pid_set_coeff(&bdd.oai_dd_2.pid_res, PID_R_K, mpi.data[8]/256., mpi.data[9]/256., mpi.data[10]/256.);
 						pid_set_coeff(&bdd.oai_dd_2.pid_current, PID_R_K, mpi.data[11]/256., mpi.data[12]/256., mpi.data[13]/256.);
 						break;
+					case BDD_MK_COMMAND_SET_STM_DEBUG:
+						stm_bdd_debug_set(&bdd.stm, mpi.data[6], mpi.data[7]);
+						break;
+					case BDD_MK_COMMAND_RUN_CALIBRATION:
+						ims_set_mode(&bdd.ims, IMS_MODE_CALIBR);
+						break;
 					default:
 						break;
 					}
@@ -93,14 +99,12 @@ void INT_ADC0_CallBack(void) {
   uint16_t chn, val;
 	NVIC_DisableIRQ(IRQn_ADC0);
 	//
-	gpio_set(&bdd.stm[9], 1);
   while(bdd.adc_0.reg->STATUS & 1) {
     rslt = bdd.adc_0.reg->RESULT;
     chn = *((uint16_t*)&rslt + 1);
     val = *((uint16_t*)&rslt) << 4;
 		adc_new_val_process(&bdd.adc_0.ch[chn], val);
   }
-	gpio_set(&bdd.stm[9], 0);
 	//
 	NVIC_EnableIRQ(IRQn_ADC0);
 }

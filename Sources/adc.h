@@ -18,7 +18,7 @@
 #define ADC_CHAN_CAL_COEF_A {5.124E-5, 5.124E-5, 5.124E-5, 5.124E-5, 5.124E-5, 5.124E-5, 5.124E-5, 5.124E-5, 5.124E-5, 5.124E-5}
 #define ADC_CHAN_CAL_COEF_B {2.070E-3, 2.070E-3, 2.070E-3, 2.070E-3, 2.070E-3, 2.070E-3, 2.070E-3, 2.070E-3, 2.070E-3, 2.070E-3}
 
-// for mean calculate
+// for mean calculation
 #define ADC_CHAN_MEAN_SIZE_2_POW 5
 #define ADC_CHAN_MEAN_SIZE (1<<ADC_CHAN_MEAN_SIZE_2_POW)
 
@@ -45,6 +45,7 @@ typedef struct
 {
   ADCxControl* reg;
 	type_ADC_channel ch[ADC0_CHAN_NUM];
+  uint16_t adc_val_arr[ADC0_CHAN_NUM];
   float temp;
 } type_ADC_model;
 
@@ -57,6 +58,7 @@ void adc_process(type_ADC_model* adc_ptr, uint16_t period_ms);
 float adc_get_ch_voltage(type_ADC_channel* adc_ch_ptr);
 float get_mcu_temp(type_ADC_model* adc_ptr);
 void adc_new_val_process(type_ADC_channel* adc_ch_ptr, uint16_t new_val);
+void _adc_new_val_process(type_ADC_model* adc_ptr);
 //
 void INT_ADC0_Handler(void);
 __weak void INT_ADC0_CallBack(void);

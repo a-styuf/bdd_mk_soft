@@ -26,14 +26,17 @@ int8_t ims_init(type_IMS_model* ims_ptr, type_TRES_model* t_res_ptr, type_ADC_ch
   ims_ptr->mvip = mvip_ptr;
   // gpio
   ims_ptr->rele_gpio = rele;
+  gpio_set(ims_ptr->rele_gpio, IMS_RELE_MEAS);
   ims_ptr->ku_gpio_0 = ku0;
   ims_ptr->ku_gpio_1 = ku1;
+  ims_set_ku(ims_ptr, IMS_KU_DEFAULT);
   //filters
   filter_init(&ims_ptr->filter_u);
   filter_parameter_set(&ims_ptr->filter_u, IMS_U_FILTER_T_CONST, IMS_U_FILTER_T_SAMPLE);
   filter_init(&ims_ptr->filter_temp);
   filter_parameter_set(&ims_ptr->filter_temp, IMS_T_FILTER_T_CONST, IMS_T_FILTER_T_SAMPLE);
-  //
+  // запускаем начальную калибровку
+  ims_set_mode(ims_ptr, IMS_MODE_CALIBR);
   return 1;
 }
 
@@ -45,17 +48,18 @@ int8_t ims_init(type_IMS_model* ims_ptr, type_TRES_model* t_res_ptr, type_ADC_ch
 void ims_reset_val(type_IMS_model* ims_ptr)
 {
   ims_ptr->pressure = 0.;
-  ims_ptr->ku = 0;
-  ims_ptr->dead_time = IMS_MEASURE_DEAD_TIME_MS;
+  ims_ptr->ku = IMS_KU_DEFAULT;
+  ims_ptr->ku_dead_time = IMS_KU_DEAD_TIME_MS;
   ims_ptr->pressure_u16 = 0;
   ims_ptr->temp = 0.;
-  ims_ptr->mode = IMS_MODE_DEFAULT;
   ims_ptr->state = 0;
+  ims_ptr->calibration_mode = 0;
+  ims_ptr->calibration_clock_ms = 0;
   // 
 }
 
 /**
-  * @brief  установка режима работы ИМД
+  * @brief  установка режима работы ИМД (обертка для присвоения переменной)
   * @param  ims_ptr указатель на програмную модель устройства
 | * @param  mode режим работы
   * @retval результат инициализации
@@ -63,6 +67,26 @@ void ims_reset_val(type_IMS_model* ims_ptr)
 void ims_set_mode(type_IMS_model* ims_ptr, uint8_t mode)
 {
   ims_ptr->mode = mode;
+  switch (ims_ptr->mode){
+    case IMS_MODE_SIMPLE:
+      //
+      break;
+    case IMS_MODE_CALIBR:
+      ims_ptr->calibration_mode = 3;
+  }
+}
+
+/**
+  * @brief  установка КУ инструментальноко ОУ
+  * @param  ims_ptr указатель на програмную модель устройства
+| * @param  ку режим работы
+  * @retval результат инициализации
+  */
+void ims_set_ku(type_IMS_model* ims_ptr, uint8_t ku)
+{
+  ims_ptr->ku = ku;
+  gpio_set(ims_ptr->ku_gpio_0, ku & 0x01);
+  gpio_set(ims_ptr->ku_gpio_1, ku & 0x02);
 }
 
 /**
@@ -72,16 +96,19 @@ void ims_set_mode(type_IMS_model* ims_ptr, uint8_t mode)
   */
 void ims_process(type_IMS_model* ims_ptr, uint16_t period_ms)
 {
-  
-  //проверка температуры канала
+  //получение температуры канала
   ims_ptr->temp = tres_get_temp(ims_ptr->t_res_ptr);
   filter_process(&ims_ptr->filter_temp, ims_ptr->temp, period_ms);
   //обновление параметров канала из данных АЦП
-  ims_ptr->voltage[ims_ptr->ku] = adc_get_ch_voltage(ims_ptr->adc_v);
-  filter_process(&ims_ptr->filter_u, ims_ptr->voltage[ims_ptr->ku], period_ms);
+  ims_ptr->meas_voltage[ims_ptr->ku] = adc_get_ch_voltage(ims_ptr->adc_v);
+  ims_ptr->pr_voltage[ims_ptr->ku] = ims_ptr->meas_voltage[ims_ptr->ku] - ims_ptr->zero_voltage[ims_ptr->ku];
+  filter_process(&ims_ptr->filter_u, ims_ptr->pr_voltage[ims_ptr->ku], period_ms);  //важно, фильтр сбрасывается после изменения КУ в блок проверки изменения КУ
   //проверка режима работы
   if (ims_ptr->mode == IMS_MODE_SIMPLE){
     ims_simple_process(ims_ptr, period_ms);
+  }
+  else if (ims_ptr->mode == IMS_MODE_CALIBR){
+    ims_calibr_process(ims_ptr, period_ms);
   }
   else if (ims_ptr->mode == IMS_MODE_OFF){
     
@@ -97,27 +124,43 @@ void ims_process(type_IMS_model* ims_ptr, uint16_t period_ms)
   */
 void ims_simple_process(type_IMS_model* ims_ptr, uint16_t period_ms)
 {
+
   ims_range_change(ims_ptr, period_ms);
 }
 
 /**
-  * @brief  определение необходимости переключения на другой диапазон
+  * @brief  калибровка по всем КУ
   * @param  ims_ptr указатель на програмную модель устройства
-  * @param  period_ms период вызова данной функции
+  * @param  period_ms период вызова функции
   */
-int8_t ims_range_change_checking(type_IMS_model* ims_ptr, float voltage)
+void ims_calibr_process(type_IMS_model* ims_ptr, uint16_t period_ms)
 {
-  //
-  if (voltage >= IMS_TOP_VOLTAGE){
-    return 1;
-  }
-  else if (voltage <= IMS_BOT_VOLTAGE){
-    return -1;
+  //  выставляем необходимое КУ согласно режиму колибровки
+  ims_set_ku(ims_ptr, ims_ptr->calibration_mode);
+  //  переключаем реле на калибровку
+  gpio_set(ims_ptr->rele_gpio, IMS_RELE_CALIB);
+  //  
+  if (ims_ptr->calibration_clock_ms >= IMS_CALIBRATION_TIME_MS){
+    ims_ptr->calibration_clock_ms = 0;
+    switch (ims_ptr->calibration_mode){
+      case 0:
+        ims_ptr->zero_voltage[ims_ptr->calibration_mode] = adc_get_ch_voltage(ims_ptr->adc_v);
+        ims_set_mode(ims_ptr, IMS_MODE_DEFAULT);
+        ims_set_ku(ims_ptr, ims_ptr->calibration_mode);
+        //  переключаем реле на измерение
+        gpio_set(ims_ptr->rele_gpio, IMS_RELE_MEAS);
+        break;
+      case 1:
+      case 2:
+      case 3:
+        ims_ptr->zero_voltage[ims_ptr->calibration_mode] = adc_get_ch_voltage(ims_ptr->adc_v);
+        ims_ptr->calibration_mode -= 1;
+        break;
+    }
   }
   else{
-    return 0;
+    ims_ptr->calibration_clock_ms += period_ms;
   }
-  //
 }
 
 /**
@@ -127,22 +170,24 @@ int8_t ims_range_change_checking(type_IMS_model* ims_ptr, float voltage)
   */
 void ims_range_change(type_IMS_model* ims_ptr, uint16_t period_ms)
 {
-  int8_t need_to_change = 0;
+  int8_t need_to_change = 0, ku = 0;;
   //
-  if (ims_ptr->dead_time > 0){
-    ims_ptr->dead_time -= period_ms;
+  if (ims_ptr->ku_dead_time > 0){
+    ims_ptr->ku_dead_time -= period_ms;
   }
   else{
-    need_to_change = ims_range_change_checking(ims_ptr, ims_ptr->voltage[ims_ptr->ku]);
+    need_to_change = ims_range_change_checking(ims_ptr, ims_ptr->meas_voltage[ims_ptr->ku], ims_ptr->pr_voltage[ims_ptr->ku]);
     //
     if (need_to_change){
       if (need_to_change == 1){
-        ims_ptr->ku = (ims_ptr->ku < 4) ? (ims_ptr->ku + 1) : ims_ptr->ku;
+        ku = (ims_ptr->ku < 3) ? (ims_ptr->ku + 1) : ims_ptr->ku;
+        ims_set_ku(ims_ptr, ku);
       }
       else if (need_to_change == -1){
-        ims_ptr->ku = (ims_ptr->ku > 0) ? (ims_ptr->ku - 1) : ims_ptr->ku;
+        ku = (ims_ptr->ku > 0) ? (ims_ptr->ku - 1) : ims_ptr->ku;
+        ims_set_ku(ims_ptr, ku);
       }
-      ims_ptr->dead_time = IMS_MEASURE_DEAD_TIME_MS;
+      ims_ptr->ku_dead_time = IMS_KU_DEAD_TIME_MS;
       filter_reset(&ims_ptr->filter_u);
     }
     else{
@@ -151,10 +196,25 @@ void ims_range_change(type_IMS_model* ims_ptr, uint16_t period_ms)
   }
 }
 
-
-void ims_calibr_process(type_IMS_model* ims_ptr, uint16_t period_ms)
+/**
+  * @brief  определение необходимости переключения на другой диапазон
+  * @param  ims_ptr указатель на програмную модель устройства
+  * @param  meas_voltage напряжение АЦП
+  * @param  pr_voltage напряжение для подсчета давления
+  */
+int8_t ims_range_change_checking(type_IMS_model* ims_ptr, float meas_voltage, float pr_voltage)
 {
-  
+  //
+  if (pr_voltage <= IMS_PR_MIN_VOLTAGE){
+    return 1;
+  }
+  else if ((meas_voltage < IMS_BOT_VOLTAGE) || (meas_voltage > IMS_TOP_VOLTAGE)) {
+    return -1;
+  }
+  else{
+    return 0;
+  }
+  //
 }
 
 /**
@@ -168,7 +228,7 @@ uint8_t ims_get_str_report(type_IMS_model* ims_ptr, char* report)
   char report_str[128] = {0};
   sprintf(report_str, "IMS: P=%.2E U=%.2E T=%.2E ku=0x%02X mode=%02X", 
                       ims_ptr->pressure,
-                      ims_ptr->voltage,
+                      ims_ptr->pr_voltage[1],
                       ims_ptr->temp,
                       ims_ptr->ku,
                       ims_ptr->mode
@@ -184,7 +244,7 @@ void ims_get_frame_report(type_IMS_model* ims_ptr)
   ims_ptr->report.state = ims_ptr->state;
   ims_ptr->report.pressure = ims_ptr->pressure_u16;
   ims_ptr->report.temp = (int16_t)floor(filter_get_value(&ims_ptr->filter_temp)*256);
-  ims_ptr->report.voltage = (int16_t)floor(ims_ptr->voltage[0]*256);
+  ims_ptr->report.voltage = (int16_t)floor(ims_ptr->meas_voltage[0]*256);
   memset((uint8_t*)ims_ptr->report.reserve, 0xFE, 18);
 }
 

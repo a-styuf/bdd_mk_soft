@@ -101,6 +101,8 @@ void adc_process(type_ADC_model* adc_ptr, uint16_t period_ms)
     adc_ptr->ch[ch_num].voltage = adc_ch_voltage(adc_ptr, ch_num);
   }
   adc_ptr->temp = calc_mcu_temp(adc_ptr);
+  //
+  _adc_new_val_process(adc_ptr);
 }
 
 /**
@@ -151,6 +153,18 @@ void adc_new_val_process(type_ADC_channel* adc_ch_ptr, uint16_t new_val)
   }
   else{
     adc_ch_ptr->val_buff_wr_ptr += 1;
+  }
+}
+
+/**
+  * @brief  складывание значений каналов АЦП в буфер для простого отображения
+  * @param  adc_ptr указатель на програмную модель устройства 
+  */
+void _adc_new_val_process(type_ADC_model* adc_ptr)
+{
+  uint16_t i=0;
+  for(i=0; i<ADC0_CHAN_NUM; i++){
+    adc_ptr->adc_val_arr[i] = adc_ptr->ch[i].val;
   }
 }
 

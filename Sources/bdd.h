@@ -15,6 +15,7 @@
 #include "bdd_mpi_interface.h"
 #include "mvip.h"
 #include "ims.h"
+#include "stm_bdd.h"
 
 //defines
 #define BDD_MK_FRAME_MODIFICATOR 1
@@ -37,6 +38,8 @@
 #define BDD_MK_COMMAND_SET_OAI_DD_2_FILTER  4
 #define BDD_MK_COMMAND_SET_OAI_DD_1_PID_SETTING  5
 #define BDD_MK_COMMAND_SET_OAI_DD_2_PID_SETITNG  6
+#define BDD_MK_COMMAND_SET_STM_DEBUG  7
+#define BDD_MK_COMMAND_RUN_CALIBRATION  8
 
 // data structures
 #pragma pack(2)
@@ -63,7 +66,11 @@ typedef struct  // программная модель управления БД
   type_OAI_DD_model oai_dd_1, oai_dd_2;
   type_IMS_model ims;
   type_MPI_model* mpi_ptr;
-  type_SINGLE_GPIO gpio[8], stm[10];
+  type_SINGLE_GPIO gpio[8], stm_io[10];
+  type_STM_BDD stm;
+  //
+  uint16_t pressure_16;
+  uint8_t temp_bdd, current_HV;
   //
   type_BDD_Frames frame;
   //

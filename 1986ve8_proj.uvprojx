@@ -467,6 +467,11 @@
               <FileType>1</FileType>
               <FilePath>.\Sources\ims.c</FilePath>
             </File>
+            <File>
+              <FileName>stm_bdd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\stm_bdd.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -951,6 +956,11 @@
               <FileType>1</FileType>
               <FilePath>.\Sources\ims.c</FilePath>
             </File>
+            <File>
+              <FileName>stm_bdd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\stm_bdd.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1434,6 +1444,11 @@
               <FileName>ims.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Sources\ims.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm_bdd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Sources\stm_bdd.c</FilePath>
             </File>
           </Files>
         </Group>

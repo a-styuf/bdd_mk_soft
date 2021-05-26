@@ -24,14 +24,14 @@ int8_t bdd_init(type_BDD_model* bdd_ptr, type_MPI_model* mpi_ptr)
   }
   //STM
   for (i=0; i<10; i++){
-    gpio_init(&bdd_ptr->stm[i], PORTE, 6+i);
-    gpio_set(&bdd_ptr->stm[i], 0);
+    gpio_init(&bdd_ptr->stm_io[i], PORTE, 6+i);
+    gpio_set(&bdd_ptr->stm_io[i], 0);
   }
+  stm_bdd_init(&bdd_ptr->stm, bdd_ptr->stm_io);
   //инициализация устройств МК
   adc_init(&bdd_ptr->adc_0);
   dac_init(&bdd_ptr->dac);
   mvip_init(&bdd_ptr->mvip, &bdd_ptr->adc_0.ch[9], &bdd_ptr->adc_0.ch[8]);
-  ims_init(&bdd_ptr->ims, &bdd_ptr->tres_ims, &bdd_ptr->adc_0.ch[0], &bdd_ptr->mvip, &bdd_ptr->gpio[4], &bdd_ptr->gpio[2], &bdd_ptr->gpio[3]);
   //mko
   bdd_ptr->mpi_ptr = mpi_ptr;
   //инициализация измерителей
@@ -41,6 +41,7 @@ int8_t bdd_init(type_BDD_model* bdd_ptr, type_MPI_model* mpi_ptr)
   //
   oai_dd_init(&bdd_ptr->oai_dd_1, 1, &bdd_ptr->tres_pirani_1, &bdd_ptr->adc_0.ch[2], &bdd_ptr->adc_0.ch[3], &bdd_ptr->dac.ch[0], V_A, V_B, I_A, I_B);
   oai_dd_init(&bdd_ptr->oai_dd_2, 2, &bdd_ptr->tres_pirani_2, &bdd_ptr->adc_0.ch[5], &bdd_ptr->adc_0.ch[6], &bdd_ptr->dac.ch[1], V_A, V_B, I_A, I_B);
+  ims_init(&bdd_ptr->ims, &bdd_ptr->tres_ims, &bdd_ptr->adc_0.ch[0], &bdd_ptr->mvip, &bdd_ptr->gpio[4], &bdd_ptr->gpio[2], &bdd_ptr->gpio[3]);
   //
   return 0;
 }
@@ -85,6 +86,8 @@ void bdd_process(type_BDD_model* bdd_ptr, uint8_t period_ms)
   if ((bdd_ptr->control.time_slot_cnter % 100) == 0){  // тайм-слот - period_ms * 100
     //
   }
+  // stm
+  stm_bdd_process(&bdd_ptr->stm, bdd_ptr->pressure_16, bdd_ptr->temp_bdd, bdd_ptr->current_HV, period_ms);
 }
 
 /**
