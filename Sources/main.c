@@ -78,8 +78,11 @@ float var_float = 0;
 					case BDD_MK_COMMAND_SET_STM_DEBUG:
 						stm_bdd_debug_set(&bdd.stm, mpi.data[6], mpi.data[7]);
 						break;
-					case BDD_MK_COMMAND_RUN_CALIBRATION:
-						ims_set_mode(&bdd.ims, IMS_MODE_CALIBR);
+					case BDD_MK_COMMAND_SET_IMS_MODE:
+						ims_set_mode(&bdd.ims, mpi.data[6] & 0xFF);
+						break;
+					case BDD_MK_COMMAND_SET_IMS_KU:
+						ims_set_ku(&bdd.ims, mpi.data[6] & 0xFF);
 						break;
 					default:
 						break;

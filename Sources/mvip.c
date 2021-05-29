@@ -72,6 +72,8 @@ void mvip_process(type_MVIP* mvip_ptr, uint16_t period_ms)
   }
   //
   Timer_PWM_Set_Fp(mvip_ptr->pwm_val_float);
+  //
+  mvip_form_report(mvip_ptr);
 }
 
 /**
@@ -114,3 +116,16 @@ uint8_t mvip_get_str_report(type_MVIP* mvip_ptr, char* report)
 	report[127] = 0;
   return strlen(report_str);
 }
+
+/**
+  * @brief  формирование отладочной для использования в кадру
+  * @param  mvip_ptr указатель на програмную модель устройства
+  */
+void mvip_form_report(type_MVIP* mvip_ptr)
+{
+  mvip_ptr->report.h_voltage = (int16_t)floor(mvip_ptr->v_hv);
+  mvip_ptr->report.current = (int16_t)floor(mvip_ptr->i_24V*256);
+  mvip_ptr->report.fb_voltage = (int16_t)floor(mvip_ptr->v_fb*256);
+  mvip_ptr->report.pwm_val = (int16_t)floor(mvip_ptr->pwm_val);
+}
+

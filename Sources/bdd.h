@@ -24,9 +24,11 @@
 
 #define BDD_MK_FRAME_TYPE_SYSTEM 0x01
 #define BDD_MK_FRAME_TYPE_OAI_DD 0x02
+#define BDD_MK_FRAME_TYPE_IMS_DD 0x03
 
 #define BDD_MK_FRAME_SADDR_SYSTEM 0x0F
 #define BDD_MK_FRAME_SADDR_OAI_DD 0x01
+#define BDD_MK_FRAME_SADDR_IMS_DD 0x02
 
 // дефайны для управления командами
 #define BDD_MK_FRAME_SADDR_COMMAND 30
@@ -39,7 +41,8 @@
 #define BDD_MK_COMMAND_SET_OAI_DD_1_PID_SETTING  5
 #define BDD_MK_COMMAND_SET_OAI_DD_2_PID_SETITNG  6
 #define BDD_MK_COMMAND_SET_STM_DEBUG  7
-#define BDD_MK_COMMAND_RUN_CALIBRATION  8
+#define BDD_MK_COMMAND_SET_IMS_MODE  8
+#define BDD_MK_COMMAND_SET_IMS_KU  9
 
 // data structures
 #pragma pack(2)
@@ -55,6 +58,7 @@ typedef struct  // программная модель управления БД
 {
 	typeSysFrames system;
 	typeOAIDDFrames oai_dd;
+	typeIMSDDFrames ims_dd;
 }type_BDD_Frames;
 
 typedef struct  // программная модель управления БДД
@@ -82,6 +86,7 @@ typedef struct  // программная модель управления БД
 int8_t bdd_init(type_BDD_model* bdd_ptr, type_MPI_model* mpi_ptr);
 void bdd_process(type_BDD_model* bdd_ptr, uint8_t period_ms);
 void bdd_oai_dd_frame_form(type_BDD_model* bdd_ptr);
+void bdd_ims_dd_frame_form(type_BDD_model* bdd_ptr);
 void bdd_system_frame_form(type_BDD_model* bdd_ptr);
 
 #endif

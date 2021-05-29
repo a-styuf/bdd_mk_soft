@@ -66,12 +66,15 @@ void ims_reset_val(type_IMS_model* ims_ptr)
   */
 void ims_set_mode(type_IMS_model* ims_ptr, uint8_t mode)
 {
+  ims_ptr->mode_after_calibration = IMS_MODE_DEFAULT;
+  ims_ptr->ku_after_calibration = ims_ptr->ku;
   ims_ptr->mode = mode;
   switch (ims_ptr->mode){
-    case IMS_MODE_SIMPLE:
+    case IMS_MODE_AUTO:
       //
       break;
     case IMS_MODE_CALIBR:
+
       ims_ptr->calibration_mode = 3;
   }
 }
@@ -104,8 +107,8 @@ void ims_process(type_IMS_model* ims_ptr, uint16_t period_ms)
   ims_ptr->pr_voltage[ims_ptr->ku] = ims_ptr->meas_voltage[ims_ptr->ku] - ims_ptr->zero_voltage[ims_ptr->ku];
   filter_process(&ims_ptr->filter_u, ims_ptr->pr_voltage[ims_ptr->ku], period_ms);  //важно, фильтр сбрасывается после изменения КУ в блок проверки изменения КУ
   //проверка режима работы
-  if (ims_ptr->mode == IMS_MODE_SIMPLE){
-    ims_simple_process(ims_ptr, period_ms);
+  if (ims_ptr->mode == IMS_MODE_AUTO){
+    ims_auto_process(ims_ptr, period_ms);
   }
   else if (ims_ptr->mode == IMS_MODE_CALIBR){
     ims_calibr_process(ims_ptr, period_ms);
@@ -122,10 +125,19 @@ void ims_process(type_IMS_model* ims_ptr, uint16_t period_ms)
   * @param  ims_ptr указатель на програмную модель устройства
   * @param  period_ms период вызова данной функции
   */
-void ims_simple_process(type_IMS_model* ims_ptr, uint16_t period_ms)
+void ims_auto_process(type_IMS_model* ims_ptr, uint16_t period_ms)
 {
-
   ims_range_change(ims_ptr, period_ms);
+}
+
+/**
+  * @brief  обработка измерения ИМД в ручном режиме
+  * @param  ims_ptr указатель на програмную модель устройства
+  * @param  period_ms период вызова данной функции
+  */
+void ims_manual_process(type_IMS_model* ims_ptr, uint16_t period_ms)
+{
+  //
 }
 
 /**
@@ -145,8 +157,8 @@ void ims_calibr_process(type_IMS_model* ims_ptr, uint16_t period_ms)
     switch (ims_ptr->calibration_mode){
       case 0:
         ims_ptr->zero_voltage[ims_ptr->calibration_mode] = adc_get_ch_voltage(ims_ptr->adc_v);
-        ims_set_mode(ims_ptr, IMS_MODE_DEFAULT);
-        ims_set_ku(ims_ptr, ims_ptr->calibration_mode);
+        ims_set_mode(ims_ptr, ims_ptr->mode_after_calibration);
+        ims_set_ku(ims_ptr, ims_ptr->ku_after_calibration);
         //  переключаем реле на измерение
         gpio_set(ims_ptr->rele_gpio, IMS_RELE_MEAS);
         break;
@@ -240,11 +252,19 @@ uint8_t ims_get_str_report(type_IMS_model* ims_ptr, char* report)
 
 void ims_get_frame_report(type_IMS_model* ims_ptr)
 {
+  uint8_t i=0;
   ims_ptr->report.mode = ims_ptr->mode;
   ims_ptr->report.state = ims_ptr->state;
   ims_ptr->report.pressure = ims_ptr->pressure_u16;
   ims_ptr->report.temp = (int16_t)floor(filter_get_value(&ims_ptr->filter_temp)*256);
-  ims_ptr->report.voltage = (int16_t)floor(ims_ptr->meas_voltage[0]*256);
-  memset((uint8_t*)ims_ptr->report.reserve, 0xFE, 18);
+  ims_ptr->report.active_voltage = (int16_t)floor(ims_ptr->pr_voltage[ims_ptr->ku]*1000);
+  ims_ptr->report.ku = (int16_t)floor(ims_ptr->ku);
+  for (i=0;i<4;i++){
+    ims_ptr->report.pr_voltage_arr[i] = (int16_t)floor(ims_ptr->pr_voltage[i]*1000);
+    ims_ptr->report.meas_voltage_arr[i] = (int16_t)floor(ims_ptr->meas_voltage[i]*1000);
+    ims_ptr->report.zero_voltage_arr[i] = (int16_t)floor(ims_ptr->zero_voltage[i]*1000);
+  }
+  memcpy((uint8_t*)&ims_ptr->report.mvip_report, (uint8_t*)&ims_ptr->mvip->report, sizeof(type_MVIP_frame_report));
+  memset((uint8_t*)ims_ptr->report.reserve, 0xFE, sizeof(ims_ptr->report.reserve));
 }
 

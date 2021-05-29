@@ -40,7 +40,18 @@ typedef struct // подробный кадр с работой ОАИ ДД
   // 
   uint16_t crc16; //+62 30
 }typeOAIDDFrames;
-//
+
+typedef struct // подробный кадр с работой ИМД ДД
+{
+  uint16_t label;  //+0
+  uint16_t definer; //+2 
+  uint16_t num; //+4
+  uint32_t time; //+6
+  // основные параметры
+  uint16_t ims_dd_report[26]; //+10
+  // 
+  uint16_t crc16; //+62 30
+}typeIMSDDFrames;
 
 // прототипы функций
 uint16_t mpi_int_frame_definer(uint8_t frame_modification, uint16_t device_number,  uint16_t fabrication_num, uint8_t frame_type);

@@ -42,6 +42,14 @@
 #pragma pack(2)
 typedef struct  // программная модель управления БДД
 {
+  uint16_t h_voltage;
+  uint16_t current;
+  uint16_t fb_voltage;
+  uint16_t pwm_val;  // 0-999
+}type_MVIP_frame_report;
+
+typedef struct  // программная модель управления БДД
+{
 	uint8_t mode;
   uint8_t state;
   uint16_t pwm_val;  // 0-999
@@ -52,6 +60,7 @@ typedef struct  // программная модель управления БД
   type_ADC_channel* adc_curr;
   type_SINGLE_GPIO hv_inh;
   type_PID_model pid;
+  type_MVIP_frame_report report;
 }type_MVIP;
 
 int8_t mvip_init(type_MVIP* mvip_ptr, type_ADC_channel* adc_v_fb, type_ADC_channel* adc_i24);
@@ -59,5 +68,6 @@ void mvip_process(type_MVIP* mvip_ptr, uint16_t period_ms);
 void mvip_set_mode(type_MVIP* mvip_ptr, uint8_t mode);
 void mvip_set_voltage(type_MVIP* mvip_ptr, float voltage);
 uint8_t mvip_get_str_report(type_MVIP* mvip_ptr, char* report);
+void mvip_form_report(type_MVIP* mvip_ptr);
 
 #endif
