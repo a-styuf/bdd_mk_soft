@@ -33,7 +33,7 @@ typedef struct
   uint16_t val_buff[ADC_CHAN_MEAN_SIZE];
   uint32_t val_buff_wr_ptr;
   
-	float voltage; //пересчитанное значение в В на входе АЦП
+	float voltage, inst_voltage; //пересчитанное значение в В на входе АЦП
 	float a, b; // калибровочные коэффициенты voltage = a*value + b
   uint8_t adc_ch_num;
 } type_ADC_channel;
@@ -53,9 +53,11 @@ typedef struct
 void adc_init(type_ADC_model* adc_ptr);
 void adc_set_ch_a_b(type_ADC_model* adc_ptr, float *a, float *b);
 float adc_ch_voltage(type_ADC_model* adc_ptr, uint8_t ch_num);
+float adc_ch_inst_voltage(type_ADC_model* adc_ptr, uint8_t ch_num);
 float calc_mcu_temp(type_ADC_model* adc_ptr);
 void adc_process(type_ADC_model* adc_ptr, uint16_t period_ms);
 float adc_get_ch_voltage(type_ADC_channel* adc_ch_ptr);
+float adc_get_ch_inst_voltage(type_ADC_channel* adc_ch_ptr);
 float get_mcu_temp(type_ADC_model* adc_ptr);
 void adc_new_val_process(type_ADC_channel* adc_ch_ptr, uint16_t new_val);
 void _adc_new_val_process(type_ADC_model* adc_ptr);

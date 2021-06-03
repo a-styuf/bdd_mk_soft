@@ -62,7 +62,7 @@ void oai_dd_reset_val(type_OAI_DD_model* oai_dd_ptr, uint8_t num, type_TRES_mode
   oai_dd_ptr->pressure = 0.;
   oai_dd_ptr->pressure_u16 = 0;
   oai_dd_ptr->temp = 0.;
-  oai_dd_ptr->mode = MODE_PID_R;
+  oai_dd_ptr->mode = MODE_PID_DEFAULT;
   oai_dd_ptr->state = 0;
   //
   oai_dd_ptr->t_res_ptr = t_res_ptr;
@@ -119,8 +119,54 @@ void oai_dd_process(type_OAI_DD_model* oai_dd_ptr, uint16_t period_ms)
   filter_process(&oai_dd_ptr->filter_res, oai_dd_ptr->pr_res, period_ms);
   filter_process(&oai_dd_ptr->filter_curr, oai_dd_ptr->pr_current, period_ms);
   filter_process(&oai_dd_ptr->filter_voltage, oai_dd_ptr->pr_voltage, period_ms);
+  //определение давления
+  oai_dd_pressure_calculate(oai_dd_ptr);
   //создать отчет
   oai_dd_get_frame_report(oai_dd_ptr);
+}
+
+
+uint16_t float_to_12b_fp(float var)
+{
+	int16_t exp = 0, man = 0;
+	exp = floor(1.*log10(var))-1;
+	man = floor(1.*var / (pow(10, exp)));
+	return ((((uint16_t)(exp))<<8)&0xFF00) + man;
+}
+
+/**
+  * @brief  подсчет давления по параметрам датчика
+  * @param  oai_dd_ptr указатель на програмную модель устройства
+  */
+void oai_dd_pressure_calculate(type_OAI_DD_model* oai_dd_ptr)
+{
+  // получение давления из показаний датчика ОАИ_ДД
+  if (oai_dd_ptr->mode == MODE_PID_R){
+    oai_dd_ptr->pressure = 0.9E-3;
+  }
+  else if (oai_dd_ptr->mode == MODE_PID_I){
+    oai_dd_ptr->pressure = 0.9E-3;
+  }
+  else{
+    oai_dd_ptr->pressure = OAD_DD_DEFAULT_PRESSURE;
+  }
+  // формирования 16-ти битного слова с давлением и статусом
+  if (oai_dd_ptr->mode == MODE_PID_R){
+    oai_dd_ptr->pressure_u16 = (0x0 & 0x01) << 15 | (oai_dd_ptr->mode & 0x7) << 12 | float_to_12b_fp(oai_dd_ptr->pressure) & 0x0FFF;
+  }
+  else if (oai_dd_ptr->mode == MODE_PID_I){
+    oai_dd_ptr->pressure_u16 = (0x0 & 0x01) << 15 | (oai_dd_ptr->mode & 0x7) << 12 | float_to_12b_fp(oai_dd_ptr->pressure) & 0x0FFF;
+  }
+  else{
+    oai_dd_ptr->pressure_u16 = (0x0 & 0x01) << 15 | (oai_dd_ptr->mode & 0x7) << 12 | 0x0159;
+  }
+  // определение нижней границы работы датчика
+  if (oai_dd_ptr->pressure < OAD_DD_LOW_BOUND_PR){
+    oai_dd_ptr->state |= OAI_DD_PRESSURE_LOW_LEVEL;
+  }
+  else{
+    oai_dd_ptr->state &= ~OAI_DD_PRESSURE_LOW_LEVEL;
+  }
 }
 
 /**

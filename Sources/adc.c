@@ -74,6 +74,24 @@ float adc_ch_voltage(type_ADC_model* adc_ptr, uint8_t ch_num)
 }
 
 /**
+  * @brief  запрос мгновенных данных канала АЦП в В
+	* @param  adc_ptr указатель на програмную модель устройства
+	* @param  ch_num номер канала
+	* @retval значение канала АЦП в В
+  */
+float adc_ch_inst_voltage(type_ADC_model* adc_ptr, uint8_t ch_num)
+{
+	float adc_ch_voltage;
+  if(ch_num>=ADC0_CHAN_NUM){
+    return 0.0;
+  }
+  NVIC_DisableIRQ(IRQn_ADC0);
+  adc_ch_voltage = (adc_ptr->ch[ch_num].a)*adc_ptr->ch[ch_num].val + adc_ptr->ch[ch_num].b;
+  NVIC_EnableIRQ(IRQn_ADC0);
+  return adc_ch_voltage;
+}
+
+/**
   * @brief  подсчет температуры (из примера Миландер)
   * @param  adc_ptr указатель на програмную модель устройства
 	* @retval значение температуры МК
@@ -99,6 +117,7 @@ void adc_process(type_ADC_model* adc_ptr, uint16_t period_ms)
 	uint8_t ch_num = 0;
   for(ch_num=0; ch_num<ADC0_CHAN_NUM; ch_num++){
     adc_ptr->ch[ch_num].voltage = adc_ch_voltage(adc_ptr, ch_num);
+    adc_ptr->ch[ch_num].inst_voltage = adc_ch_inst_voltage(adc_ptr, ch_num);
   }
   adc_ptr->temp = calc_mcu_temp(adc_ptr);
   //
@@ -115,6 +134,19 @@ float adc_get_ch_voltage(type_ADC_channel* adc_ch_ptr)
 {
   volatile float adc_voltage = 0;
   adc_voltage = adc_ch_ptr->voltage;
+  return adc_voltage;
+}
+
+/**
+  * @brief  запрос напряжения канала буз усрднения
+  * @param  adc_ch_ptr указатель на програмную модель канала АЦП
+  * @param  ch_num номер необходимого канала
+	* @retval значение напряжения на входе АЦП
+  */
+float adc_get_ch_inst_voltage(type_ADC_channel* adc_ch_ptr)
+{
+  volatile float adc_voltage = 0;
+  adc_voltage = adc_ch_ptr->inst_voltage;
   return adc_voltage;
 }
 

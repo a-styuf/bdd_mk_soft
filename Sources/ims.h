@@ -14,7 +14,7 @@
 #define IMS_MODE_MANUAL   0x02
 #define IMS_MODE_CALIBR   0x03
 #define IMS_MODE_DEFAULT  IMS_MODE_AUTO
-// oai_dd_status fields
+//dd_status fields
 #define IMS_PID_OK      1<<0
 //
 #define IMS_KU_1        0x00
@@ -22,7 +22,7 @@
 #define IMS_KU_100      0x02
 #define IMS_KU_1000     0x03
 #define IMS_KU_DEFAULT  IMS_KU_1
-// oai_dd_mean_settings
+// dd_mean_settings
 #define IMS_TIME_S      1.0
 // voltage filter settings
 #define IMS_U_FILTER_T_CONST    1.

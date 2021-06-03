@@ -84,6 +84,9 @@ float var_float = 0;
 					case BDD_MK_COMMAND_SET_IMS_KU:
 						ims_set_ku(&bdd.ims, mpi.data[6] & 0xFF);
 						break;
+					case BDD_MK_COMMAND_SET_BDD_MODE:
+						bdd_set_mode(&bdd, mpi.data[6] & 0xFF);
+						break;
 					default:
 						break;
 					}

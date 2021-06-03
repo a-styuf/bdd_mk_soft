@@ -42,7 +42,8 @@ int8_t bdd_init(type_BDD_model* bdd_ptr, type_MPI_model* mpi_ptr)
   oai_dd_init(&bdd_ptr->oai_dd_1, 1, &bdd_ptr->tres_pirani_1, &bdd_ptr->adc_0.ch[2], &bdd_ptr->adc_0.ch[3], &bdd_ptr->dac.ch[0], V_A, V_B, I_A, I_B);
   oai_dd_init(&bdd_ptr->oai_dd_2, 2, &bdd_ptr->tres_pirani_2, &bdd_ptr->adc_0.ch[5], &bdd_ptr->adc_0.ch[6], &bdd_ptr->dac.ch[1], V_A, V_B, I_A, I_B);
   ims_init(&bdd_ptr->ims, &bdd_ptr->tres_ims, &bdd_ptr->adc_0.ch[0], &bdd_ptr->mvip, &bdd_ptr->gpio[4], &bdd_ptr->gpio[2], &bdd_ptr->gpio[3]);
-  //
+  // инициализация состояния
+  bdd_ctrl_reset(bdd_ptr);
   return 0;
 }
 
@@ -52,11 +53,15 @@ int8_t bdd_init(type_BDD_model* bdd_ptr, type_MPI_model* mpi_ptr)
   */
 void bdd_ctrl_reset(type_BDD_model* bdd_ptr)
 {
-  bdd_ptr->control.mode = 0x00;
+  bdd_ptr->control.mode = BDD_MK_MODE_DEFAULT;
   bdd_ptr->control.state = 0x00;
   bdd_ptr->control.error = 0x00;
   bdd_ptr->control.error_cnt = 0x00;
   bdd_ptr->control.time_slot_cnter = 0x00;
+  bdd_ptr->control.pressure_source = BDD_MK_PR_SOURCE_DEFAULT;
+  bdd_ptr->control.ims_pwron_flag = 0;
+  bdd_ptr->control.ims_pwron_timeout_flag = 0;
+  bdd_ptr->control.ims_pwron_timeout_counter = 0;
 }
 
 /**
@@ -71,9 +76,9 @@ void bdd_process(type_BDD_model* bdd_ptr, uint8_t period_ms)
     //обработка процессов
     adc_process(&bdd_ptr->adc_0, period_ms);
     ims_process(&bdd_ptr->ims, period_ms);
-    mvip_process(&bdd_ptr->mvip, period_ms);
   }
   if ((bdd_ptr->control.time_slot_cnter % 10) == 0){  // тайм-слот - period_ms * 10
+    mvip_process(&bdd_ptr->mvip, period_ms*10);
     //обработка oai_dd
     oai_dd_process(&bdd_ptr->oai_dd_1, period_ms*10);
     oai_dd_process(&bdd_ptr->oai_dd_2, period_ms*10);
@@ -88,8 +93,121 @@ void bdd_process(type_BDD_model* bdd_ptr, uint8_t period_ms)
   if ((bdd_ptr->control.time_slot_cnter % 100) == 0){  // тайм-слот - period_ms * 100
     //
   }
+  //
+  bdd_state_check(bdd_ptr, period_ms);
+  switch(bdd_ptr->control.pressure_source){
+    case BDD_MK_PR_SOURCE_DEFAULT:
+      bdd_ptr->pressure_16 = BDD_MK_PRESSURE_DEFAULT;
+      break;
+    case BDD_MK_PR_SOURCE_IMS:
+      bdd_ptr->pressure_16 = bdd_ptr->ims.pressure_u16;
+      break;
+    case BDD_MK_PR_SOURCE_OAI_DD:
+    bdd_ptr->pressure_16 = bdd_ptr->oai_dd_1.pressure_u16;
+      break;
+  }
   // stm
   stm_bdd_process(&bdd_ptr->stm, bdd_ptr->pressure_16, bdd_ptr->temp_bdd, bdd_ptr->current_HV, period_ms);
+}
+
+/**
+  * @brief  установка режима работы БДД как датчика давления
+  * @param  bdd_ptr указатель на програмную модель устройства
+  * @param  mode установка режима согласно режимам в *.h файле
+  */
+void bdd_set_mode(type_BDD_model* bdd_ptr, uint8_t mode)
+{
+  bdd_ptr->control.mode = mode;
+  switch(mode){
+    case BDD_MK_MODE_OFF:
+      ims_set_mode(&bdd_ptr->ims, IMS_MODE_OFF);
+      oai_dd_set_mode(&bdd_ptr->oai_dd_1,MODE_PID_OFF);
+      oai_dd_set_mode(&bdd_ptr->oai_dd_2,MODE_PID_OFF);
+      break;
+    case BDD_MK_MODE_AUTO:
+      ims_set_mode(&bdd_ptr->ims, IMS_MODE_OFF);
+      oai_dd_set_mode(&bdd_ptr->oai_dd_1, MODE_PID_R);
+      oai_dd_set_mode(&bdd_ptr->oai_dd_2, MODE_PID_R);
+      break;
+    case BDD_MK_MODE_IMS:
+      ims_set_mode(&bdd_ptr->ims, IMS_MODE_MANUAL);
+      oai_dd_set_mode(&bdd_ptr->oai_dd_1, MODE_PID_OFF);
+      oai_dd_set_mode(&bdd_ptr->oai_dd_2, MODE_PID_OFF);
+      break;
+    case BDD_MK_MODE_OAI_DD:
+      ims_set_mode(&bdd_ptr->ims, IMS_MODE_OFF);
+      oai_dd_set_mode(&bdd_ptr->oai_dd_1, MODE_PID_R);
+      oai_dd_set_mode(&bdd_ptr->oai_dd_2, MODE_PID_R);
+      break;
+    default:
+      bdd_set_mode(bdd_ptr, BDD_MK_MODE_DEFAULT);
+      break;
+  }
+}
+
+/**
+  * @brief  принятие решение о работе БДД: какой датчик работает сейчас, переходные процессы, и т.п.
+  * @param  bdd_ptr указатель на програмную модель устройства
+  * @param  period_ms период вызова функции
+  */
+void bdd_state_check(type_BDD_model* bdd_ptr, uint8_t period_ms)
+{
+  switch (bdd_ptr->control.mode){
+    case BDD_MK_MODE_OFF:
+      bdd_ptr->control.pressure_source = BDD_MK_PR_SOURCE_DEFAULT;
+      break;
+    case BDD_MK_MODE_AUTO:
+      // определение запуска ИМС
+      if ((bdd_ptr->oai_dd_1.state & OAI_DD_PRESSURE_LOW_LEVEL) || (bdd_ptr->oai_dd_1.state & OAI_DD_PRESSURE_LOW_LEVEL)){
+        if (bdd_ptr->control.ims_pwron_flag == 0){
+          bdd_ptr->control.ims_pwron_flag = 1;
+          bdd_ptr->control.ims_pwron_timeout_flag = 1;
+          bdd_ptr->control.ims_pwron_timeout_counter = BDD_MK_IMS_PWR_ON_TIMEOUT_MS;
+        }
+        else if(bdd_ptr->control.ims_pwron_flag == 1){
+          if ((bdd_ptr->control.ims_pwron_timeout_flag == 1) && (bdd_ptr->control.ims_pwron_timeout_counter > 0)){
+            bdd_ptr->control.ims_pwron_timeout_counter -= period_ms;
+          }
+          else if ((bdd_ptr->control.ims_pwron_timeout_flag == 1) && (bdd_ptr->control.ims_pwron_timeout_counter <= 0)){
+            bdd_ptr->control.ims_pwron_timeout_counter = 0;
+            bdd_ptr->control.ims_pwron_timeout_flag = 0;
+          }
+          else{
+            bdd_ptr->control.ims_pwron_timeout_counter = 0;
+            bdd_ptr->control.ims_pwron_timeout_flag = 0;
+          }
+        }
+      }
+      else if (bdd_ptr->ims.mvip->state & MVIP_STATE_OVEVRCURRENT){
+        bdd_ptr->control.ims_pwron_flag = 0;
+        bdd_ptr->control.ims_pwron_timeout_flag = 0;
+        bdd_ptr->control.ims_pwron_timeout_counter = 0;
+      }
+      // определение источниа информации о давлении
+      if (bdd_ptr->control.ims_pwron_flag == 0){
+        bdd_ptr->control.pressure_source = BDD_MK_PR_SOURCE_OAI_DD;
+      }
+      else if ((bdd_ptr->control.ims_pwron_flag == 1) && (bdd_ptr->control.ims_pwron_timeout_flag == 1)){
+        bdd_ptr->control.pressure_source = BDD_MK_PR_SOURCE_OAI_DD;
+      }
+      else if ((bdd_ptr->control.ims_pwron_flag == 1) && (bdd_ptr->control.ims_pwron_timeout_flag == 0)){
+        bdd_ptr->control.pressure_source = BDD_MK_PR_SOURCE_IMS;
+      }
+      else{
+        bdd_ptr->control.pressure_source = BDD_MK_PR_SOURCE_OAI_DD;
+      }
+      break;
+    case BDD_MK_MODE_IMS:
+      bdd_ptr->control.pressure_source = BDD_MK_PR_SOURCE_IMS;
+      break;
+    case BDD_MK_MODE_OAI_DD:
+      bdd_ptr->control.pressure_source = BDD_MK_PR_SOURCE_OAI_DD;
+      break;
+    default:
+      bdd_ptr->control.pressure_source = BDD_MK_PR_SOURCE_OAI_DD;
+      break;
+    
+  }
 }
 
 /**

@@ -19,7 +19,7 @@ int8_t mvip_init(type_MVIP* mvip_ptr, type_ADC_channel* adc_v_fb, type_ADC_chann
   mvip_ptr->mode = MVIP_MODE_OFF;
   mvip_ptr->state = 0;
   mvip_ptr->pwm_val = 0;
-  mvip_ptr->pwm_val_float = 0;
+  mvip_ptr->pwm_val_float = MVIP_DEFAULT_PWM_2500V;
   //
 	mvip_ptr->hv_inh.port = PORTE;
 	mvip_ptr->hv_inh.num = 17;
@@ -56,14 +56,20 @@ void mvip_process(type_MVIP* mvip_ptr, uint16_t period_ms)
     mvip_ptr->pwm_val_float += pwm_step;
   }
   mvip_ptr->pwm_val = (uint16_t)mvip_ptr->pwm_val_float;
-  //
+  // state calculate
   if (MVIP_VOLTAGE_MAX_ERROR >= fabs(mvip_ptr->pid.error)){
     mvip_ptr->state |= MVIP_STATE_HV;
   }
   else{
     mvip_ptr->state &= ~MVIP_STATE_HV;
   }
-  //
+  if (MVIP_CURRENT_24V_MAX < mvip_ptr->i_24V){
+    mvip_ptr->state |= MVIP_STATE_OVEVRCURRENT;
+  }
+  else{
+    mvip_ptr->state &= ~MVIP_STATE_OVEVRCURRENT;
+  }
+  // 
   if (mvip_ptr->mode & MVIP_MODE_ON){
     gpio_set(&mvip_ptr->hv_inh, 0);
   }

@@ -14,15 +14,18 @@
 //defines
 
 // PID Current-stabilisation
-#define PID_K 1.0
+#define PID_K 0.1
 #define PID_P 0.001
 #define PID_D 0.0
 #define PID_I 0.0
-#define MVIP_PID_MAX_REACTION 1
+#define MVIP_PID_MAX_REACTION 1.0
+
+#define MVIP_DEFAULT_PWM_2500V 13.37
 
 #define MVIP_VOLTAGE_DEFAULT 2500
 #define MVIP_MAX_V 2800
 #define MVIP_VOLTAGE_MAX_ERROR 50
+#define MVIP_CURRENT_24V_MAX 100
 
 #define MVIP_A 1.407E3   // рассчетное 1406
 #define MVIP_B 1.12      // рассчетное 0.0
@@ -32,11 +35,14 @@
 
 // states
 #define MVIP_STATE_HV    1<<0
-#define MVIP_STATE_PWR   1<<1
+#define MVIP_STATE_OVEVRCURRENT 1<<1
+#define MVIP_STATE_FEEDBACKERROR 1<<2
 
 // mode
-#define MVIP_MODE_OFF  0<<0
-#define MVIP_MODE_ON   1<<0
+#define MVIP_MODE_OFF  0
+#define MVIP_MODE_ON   1
+
+// state_flag
 
 // data structures
 #pragma pack(2)

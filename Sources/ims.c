@@ -110,11 +110,26 @@ void ims_process(type_IMS_model* ims_ptr, uint16_t period_ms)
   if (ims_ptr->mode == IMS_MODE_AUTO){
     ims_auto_process(ims_ptr, period_ms);
   }
+  else if (ims_ptr->mode == IMS_MODE_MANUAL){
+    ims_manual_process(ims_ptr, period_ms);
+  }
   else if (ims_ptr->mode == IMS_MODE_CALIBR){
     ims_calibr_process(ims_ptr, period_ms);
   }
   else if (ims_ptr->mode == IMS_MODE_OFF){
     
+  }
+  //включение МВИП
+  switch(ims_ptr->mode){
+    case IMS_MODE_AUTO:
+    case IMS_MODE_MANUAL:
+    case IMS_MODE_CALIBR:
+      mvip_set_mode(ims_ptr->mvip, MVIP_MODE_ON);
+      break;
+    case IMS_MODE_OFF:
+    default:
+      mvip_set_mode(ims_ptr->mvip, MVIP_MODE_OFF);
+      break;
   }
   //создать отчет
   ims_get_frame_report(ims_ptr);

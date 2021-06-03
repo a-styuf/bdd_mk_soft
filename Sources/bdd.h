@@ -43,6 +43,22 @@
 #define BDD_MK_COMMAND_SET_STM_DEBUG  7
 #define BDD_MK_COMMAND_SET_IMS_MODE  8
 #define BDD_MK_COMMAND_SET_IMS_KU  9
+#define BDD_MK_COMMAND_SET_BDD_MODE 10
+
+// режимы работы БДД
+#define BDD_MK_MODE_OFF 0
+#define BDD_MK_MODE_AUTO 1
+#define BDD_MK_MODE_IMS 2
+#define BDD_MK_MODE_OAI_DD 3
+#define BDD_MK_MODE_DEFAULT BDD_MK_MODE_AUTO
+
+//давление по умолчанию
+#define BDD_MK_PRESSURE_DEFAULT 0x0000
+#define BDD_MK_IMS_PWR_ON_TIMEOUT_MS 2000
+
+#define BDD_MK_PR_SOURCE_DEFAULT 0x00
+#define BDD_MK_PR_SOURCE_IMS 0x01
+#define BDD_MK_PR_SOURCE_OAI_DD 0x02
 
 // data structures
 #pragma pack(2)
@@ -50,8 +66,14 @@ typedef struct  // программная модель управления БД
 {
 	uint8_t mode;
   uint8_t state;
+  //
+  uint8_t pressure_source;
+  uint8_t ims_pwron_flag, ims_pwron_timeout_flag;
+  int32_t ims_pwron_timeout_counter;
+  //
   uint8_t error, error_cnt;
   uint32_t time_slot_cnter;
+
 }type_BDD_Control;
 
 typedef struct  // программная модель управления БДД
@@ -84,7 +106,10 @@ typedef struct  // программная модель управления БД
 // function prototypes
 
 int8_t bdd_init(type_BDD_model* bdd_ptr, type_MPI_model* mpi_ptr);
+void bdd_ctrl_reset(type_BDD_model* bdd_ptr);
 void bdd_process(type_BDD_model* bdd_ptr, uint8_t period_ms);
+void bdd_set_mode(type_BDD_model* bdd_ptr, uint8_t mode);
+void bdd_state_check(type_BDD_model* bdd_ptr, uint8_t period_ms);
 void bdd_oai_dd_frame_form(type_BDD_model* bdd_ptr);
 void bdd_ims_dd_frame_form(type_BDD_model* bdd_ptr);
 void bdd_system_frame_form(type_BDD_model* bdd_ptr);

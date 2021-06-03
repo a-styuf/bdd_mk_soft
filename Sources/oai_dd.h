@@ -2,16 +2,21 @@
 #define _OAI_DD_H_
 
 #include "1986ve8_lib/cm4ikmcu.h"
+#include <math.h>
 #include "termo_res.h"
 #include "adc.h"
 #include "dac.h"
 #include "digital_filter.h"
 
+
 //
 #define MODE_PID_OFF 0x00
 #define MODE_PID_R 0x01
 #define MODE_PID_I 0x02
-#define MODE_PID_AUTO 0x03
+#define MODE_PID_DEFAULT MODE_PID_R
+// oai_dd_status fields
+#define OAI_DD_PID_OK 1<<0
+#define OAI_DD_PRESSURE_LOW_LEVEL 1<<1
 // Подсчет тока на лампочке (диффиренциальное включение ОУ: U_out[mA] = dUin*(R1/R2))
 #define I_R_SHUNT 10.0  // измерительное сопротивление для ткоа
 #define I_R1_FB_AMPL 20.0E4  // сопротивление обратной связи
@@ -44,10 +49,11 @@
 //
 #define DD_DAC_MAX_VOLTAGE (3.3)
 #define DD_DAC_MIN_VOLTAGE (0.8)
-// oai_dd_status fields
-#define OAI_DD_PID_OK 1<<0
 // oai_dd_mean_settings
 #define OAI_DD_TIME_S 2.0
+// pressure parameters
+#define OAD_DD_DEFAULT_PRESSURE 890
+#define OAD_DD_LOW_BOUND_PR 1E-3
 
 
 #pragma pack(2)
@@ -116,6 +122,7 @@ int8_t oai_dd_init(type_OAI_DD_model* oai_dd_ptr, uint8_t num, type_TRES_model* 
 void oai_dd_reset_val(type_OAI_DD_model* oai_dd_ptr, uint8_t num, type_TRES_model* t_res_ptr, type_ADC_channel* adc_ch_v_ptr, type_ADC_channel* adc_ch_i_ptr, type_DAC_channel* dac_ch_ptr, float v_a, float v_b, float curr_a, float curr_b);
 void oai_dd_set_mode(type_OAI_DD_model* oai_dd_ptr, uint8_t mode);
 void oai_dd_process(type_OAI_DD_model* oai_dd_ptr, uint16_t period_ms);
+void oai_dd_pressure_calculate(type_OAI_DD_model* oai_dd_ptr);
 void oai_dd_pid_resistance(type_OAI_DD_model* oai_dd_ptr, uint16_t period_ms);
 void oai_dd_pid_current(type_OAI_DD_model* oai_dd_ptr, uint16_t period_ms);
 float oai_dd_get_voltage(type_OAI_DD_model* oai_dd_ptr);
